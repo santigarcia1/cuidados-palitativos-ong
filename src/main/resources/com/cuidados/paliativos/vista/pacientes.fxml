@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cuidados.paliativos.ong.controlador.ControladorPacientes">
+    <top><Label text="Gestión de Pacientes" style="-fx-font-size:16px; -fx-padding:10;"/></top>
+    <center>
+        <TableView fx:id="tablaPacientes" prefHeight="300" prefWidth="600"/>
+    </center>
+    <bottom>
+        <ToolBar>
+            <Button text="Nuevo" onAction="#nuevoPaciente"/>
+            <Button text="Editar" onAction="#editarPaciente"/>
+            <Button text="Eliminar" onAction="#eliminarPaciente"/>
+        </ToolBar>
+    </bottom>
+</BorderPane>
