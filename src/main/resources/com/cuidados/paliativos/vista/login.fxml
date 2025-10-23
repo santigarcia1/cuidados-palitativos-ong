@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="415.0" prefWidth="523.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cuidados.paliativos.controlador.ControladorLogin">
+    <children>
+        <VBox alignment="CENTER" layoutX="97.0" layoutY="237.0" prefHeight="17.0" prefWidth="335.0" spacing="10">
+            <Label fx:id="lblError" prefHeight="26.0" prefWidth="331.0" textFill="red" />
+        </VBox>
+         <Button layoutX="97.0" layoutY="263.0" onAction="#onLogin" prefHeight="25.0" prefWidth="329.0" text="Iniciar sesión" />
+         <PasswordField fx:id="txtPassword" layoutX="97.0" layoutY="205.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="329.0" promptText="Ingrese  su contraseña" />
+         <TextField fx:id="txtEmail" layoutX="97.0" layoutY="135.0" prefHeight="25.0" prefWidth="329.0" promptText="Ingrese su email" />
+         <Label layoutX="63.0" layoutY="65.0" style="-fx-font-size:20px; -fx-font-weight:bold;" text="Sistema de Gestión de Cuidados Paliativos">
+         <font>
+            <Font name="Roboto" size="12.0" />
+         </font>
+      </Label>
+      <Text layoutX="97.0" layoutY="124.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Email">
+         <font>
+            <Font size="13.0" />
+         </font>
+      </Text>
+      <Text layoutX="95.0" layoutY="192.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Contraseña">
+         <font>
+            <Font size="13.0" />
+         </font>
+      </Text>
+      <Label layoutX="123.0" layoutY="35.0" style="-fx-font-size:20px; -fx-font-weight:bold;" text="Organización Manos Abiertas">
+         <font>
+            <Font name="Roboto" size="12.0" />
+         </font>
+      </Label>
+    </children>
+</AnchorPane>
