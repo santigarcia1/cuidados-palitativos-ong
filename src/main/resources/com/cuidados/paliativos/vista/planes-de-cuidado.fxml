@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="550" prefWidth="800" style="-fx-background-color: #2C3E50;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cuidados.paliativos.ong.controlador.ControladorPlanesCuidado">
+<BorderPane prefHeight="550" prefWidth="800" style="-fx-background-color: #2C3E50;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cuidados.paliativos.controlador.ControladorPlanesCuidado">
 
     <!-- ENCABEZADO -->
     <top>

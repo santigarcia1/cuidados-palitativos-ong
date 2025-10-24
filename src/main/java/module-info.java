@@ -13,4 +13,5 @@ module com.cuidados.paliativos.ong.cuidadospalitativosong {
     opens com.cuidados.paliativos to javafx.fxml;
     opens com.cuidados.paliativos.controlador to javafx.fxml;
     exports com.cuidados.paliativos;
+    exports com.cuidados.paliativos.controlador;
 }

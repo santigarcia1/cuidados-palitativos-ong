@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefHeight="550" prefWidth="800"
+            style="-fx-background-color: #2C3E50;"
+            xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.cuidados.paliativos.controlador.ControladorMedicamento">
+
+    <!-- ENCABEZADO -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="10"
+              style="-fx-background-color: #34495E; -fx-padding: 10;">
+            <Label text="Gestión de Medicamentos"
+                   style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;" />
+        </HBox>
+    </top>
+
+    <!-- CONTENIDO CENTRAL -->
+    <center>
+        <VBox alignment="TOP_CENTER" spacing="15">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20" />
+            </padding>
+
+            <!-- FORMULARIO -->
+            <GridPane hgap="15" vgap="10">
+                <columnConstraints>
+                    <ColumnConstraints halignment="RIGHT" minWidth="150"/>
+                    <ColumnConstraints halignment="LEFT" minWidth="250"/>
+                </columnConstraints>
+
+                <!-- Nombre -->
+                <Label text="Nombre del medicamento:" style="-fx-text-fill: white;"/>
+                <TextField fx:id="txtNombreMedicamento" prefWidth="250" GridPane.columnIndex="1"/>
+
+                <!-- Dosis -->
+                <Label text="Dosis recomendada:" style="-fx-text-fill: white;" GridPane.rowIndex="1"/>
+                <TextField fx:id="txtDosis" prefWidth="250" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                <!-- Frecuencia -->
+                <Label text="Frecuencia:" style="-fx-text-fill: white;" GridPane.rowIndex="2"/>
+                <ComboBox fx:id="cbFrecuencia" prefWidth="250"
+                          promptText="Seleccione una frecuencia"
+                          GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+            </GridPane>
+
+            <!-- BOTONES -->
+            <HBox alignment="CENTER" spacing="10">
+                <Button text="Nuevo" onAction="#nuevoMedicamento"
+                        style="-fx-background-color: #2980B9; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                <Button text="Guardar" onAction="#guardarMedicamento"
+                        style="-fx-background-color: #27AE60; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                <Button text="Modificar" onAction="#modificarMedicamento"
+                        style="-fx-background-color: #F39C12; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                <Button text="Eliminar" onAction="#eliminarMedicamento"
+                        style="-fx-background-color: #E74C3C; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                <Button text="Consultar" onAction="#consultarMedicamento"
+                        style="-fx-background-color: #8E44AD; -fx-text-fill: white; -fx-font-weight: bold;"/>
+            </HBox>
+
+            <!-- TABLA DE MEDICAMENTOS -->
+            <TableView fx:id="tablaMedicamentos" prefWidth="700"
+                       style="-fx-background-color: #ECF0F1; -fx-border-radius: 5;">
+                <columns>
+                    <TableColumn fx:id="colId" text="ID" prefWidth="60"/>
+                    <TableColumn fx:id="colNombre" text="Nombre" prefWidth="200"/>
+                    <TableColumn fx:id="colDosis" text="Dosis" prefWidth="200"/>
+                    <TableColumn fx:id="colFrecuencia" text="Frecuencia" prefWidth="200"/>
+                </columns>
+            </TableView>
+
+        </VBox>
+    </center>
+
+</BorderPane>

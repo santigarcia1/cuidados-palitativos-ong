@@ -1,12 +1,15 @@
-package com.cuidados.paliativos.ong.controlador;
+package com.cuidados.paliativos.controlador;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
-import javafx.util.StringConverter;
+
+import java.io.IOException;
 import java.time.LocalDate;
 
 /**
@@ -97,34 +100,34 @@ public class ControladorPlanesCuidado {
         }
     }
 
-    // --- Creación de nuevos medicamentos y dietas ---
     @FXML
     private void crearNuevoMedicamento() {
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Nuevo Medicamento");
-        dialog.setHeaderText("Agregar nuevo medicamento");
-        dialog.setContentText("Nombre del medicamento:");
-        dialog.showAndWait().ifPresent(nombre -> {
-            if (!nombre.isBlank()) {
-                medicamentos.add(nombre);
-                cbMedicamentos.setValue(nombre);
-            }
-        });
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/cuidados/paliativos/vista/medicamentos.fxml"));
+            Parent root = loader.load();
+            Stage stage = new Stage();
+            stage.setTitle("Gestión de Medicamentos");
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
     private void crearNuevaDieta() {
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Nueva Dieta");
-        dialog.setHeaderText("Agregar nueva dieta");
-        dialog.setContentText("Nombre de la dieta:");
-        dialog.showAndWait().ifPresent(nombre -> {
-            if (!nombre.isBlank()) {
-                dietas.add(nombre);
-                cbDietas.setValue(nombre);
-            }
-        });
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/cuidados/paliativos/vista/dietas.fxml"));
+            Parent root = loader.load();
+            Stage stage = new Stage();
+            stage.setTitle("Gestión de Dietas");
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+
 
     // --- Utilidad ---
     private void mostrarAlerta(String mensaje, Alert.AlertType tipo) {
