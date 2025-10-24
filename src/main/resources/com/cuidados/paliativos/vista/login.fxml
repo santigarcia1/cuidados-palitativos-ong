@@ -6,36 +6,31 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
-<?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="415.0" prefWidth="523.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cuidados.paliativos.controlador.ControladorLogin">
+<AnchorPane prefHeight="400" prefWidth="520" style="-fx-background-color: #2C3E50;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cuidados.paliativos.controlador.ControladorLogin">
+
     <children>
-        <VBox alignment="CENTER" layoutX="97.0" layoutY="237.0" prefHeight="17.0" prefWidth="335.0" spacing="10">
-            <Label fx:id="lblError" prefHeight="26.0" prefWidth="331.0" textFill="red" />
+        <!-- Contenedor principal centrado -->
+        <VBox alignment="CENTER" layoutX="60" layoutY="60" prefWidth="400" spacing="15">
+
+            <!-- Título -->
+            <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: white;" text="Organización Manos Abiertas" />
+            <Label style="-fx-font-size: 14px; -fx-text-fill: #BDC3C7;" text="Sistema de Gestión de Cuidados Paliativos" />
+
+            <!-- Contenedor del formulario -->
+            <VBox alignment="CENTER_LEFT" spacing="10" style="-fx-padding: 20;">
+                <Label style="-fx-text-fill: #ECF0F1; -fx-font-size: 13px;" text="Correo electrónico:" />
+                <TextField fx:id="txtEmail" prefWidth="300" promptText="Ingrese su correo electrónico" style="-fx-background-radius: 5; -fx-border-radius: 5; -fx-background-color: #ECF0F1;" />
+
+                <Label style="-fx-text-fill: #ECF0F1; -fx-font-size: 13px;" text="Contraseña:" />
+                <PasswordField fx:id="txtPassword" prefWidth="300" promptText="Ingrese su contraseña" style="-fx-background-radius: 5; -fx-border-radius: 5; -fx-background-color: #ECF0F1;" />
+
+                <!-- Mensaje de error -->
+                <Label fx:id="lblError" prefWidth="300" textFill="red" />
+
+                <!-- Botón principal -->
+                <Button onAction="#onLogin" prefHeight="25.0" prefWidth="367.0" style="-fx-background-color: #27AE60; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5;" text="Iniciar Sesión" />
+            </VBox>
         </VBox>
-         <Button layoutX="97.0" layoutY="263.0" onAction="#onLogin" prefHeight="25.0" prefWidth="329.0" text="Iniciar sesión" />
-         <PasswordField fx:id="txtPassword" layoutX="97.0" layoutY="205.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="329.0" promptText="Ingrese  su contraseña" />
-         <TextField fx:id="txtEmail" layoutX="97.0" layoutY="135.0" prefHeight="25.0" prefWidth="329.0" promptText="Ingrese su email" />
-         <Label layoutX="63.0" layoutY="65.0" style="-fx-font-size:20px; -fx-font-weight:bold;" text="Sistema de Gestión de Cuidados Paliativos">
-         <font>
-            <Font name="Roboto" size="12.0" />
-         </font>
-      </Label>
-      <Text layoutX="97.0" layoutY="124.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Email">
-         <font>
-            <Font size="13.0" />
-         </font>
-      </Text>
-      <Text layoutX="95.0" layoutY="192.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Contraseña">
-         <font>
-            <Font size="13.0" />
-         </font>
-      </Text>
-      <Label layoutX="123.0" layoutY="35.0" style="-fx-font-size:20px; -fx-font-weight:bold;" text="Organización Manos Abiertas">
-         <font>
-            <Font name="Roboto" size="12.0" />
-         </font>
-      </Label>
     </children>
 </AnchorPane>

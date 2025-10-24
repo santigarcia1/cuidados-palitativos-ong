@@ -1,5 +1,6 @@
 package com.cuidados.paliativos.controlador;
 
+import com.cuidados.paliativos.MainApp;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -18,4 +19,6 @@ public class ControladorMenu {
     @FXML private void abrirVoluntarios() throws Exception { abrir("voluntarios.fxml","Voluntarios"); }
     @FXML private void abrirPlanes() throws Exception { abrir("planes-de-cuidado.fxml","Planes de cuidado"); }
     @FXML private void abrirDietas() throws Exception { abrir("dietas.fxml","Dietas"); }
+    @FXML private void abrirMedicamentos() throws Exception { abrir("medicamentos.fxml","Medicamentos"); }
+    @FXML private void cerrarSesion() throws Exception { MainApp.showLogin(); }
 }
