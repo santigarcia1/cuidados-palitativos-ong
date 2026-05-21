@@ -16,7 +16,7 @@ public class ControladorLogin {
         String email = txtEmail.getText();
         String pw = txtPassword.getText();
 
-        if ("admin@manosabiertas.org".equals(email) && "admin".equals(pw)) {
+        if ("admin".equals(email) && "admin".equals(pw)) {
             try { MainApp.showMainMenu(); }
             catch (Exception e) { e.printStackTrace(); }
         } else {

@@ -19,14 +19,12 @@ public class MainApp extends Application {
     public static void showLogin() throws Exception {
         FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("/com/cuidados/paliativos/vista/login.fxml"));
         Scene scene = new Scene(loader.load());
-        scene.getStylesheets().add(MainApp.class.getResource("/com/cuidados/paliativos/vista/aplicacion.css").toExternalForm());
         mainStage.setScene(scene);
     }
 
     public static void showMainMenu() throws Exception {
         FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("/com/cuidados/paliativos/vista/menu-principal.fxml"));
         Scene scene = new Scene(loader.load());
-        scene.getStylesheets().add(MainApp.class.getResource("/com/cuidados/paliativos/vista/aplicacion.css").toExternalForm());
         mainStage.setScene(scene);
     }
 

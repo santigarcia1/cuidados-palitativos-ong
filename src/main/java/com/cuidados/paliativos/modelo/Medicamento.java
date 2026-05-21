@@ -8,8 +8,7 @@ public class Medicamento {
 
     public Medicamento() {}
 
-    public Medicamento(Long id, String nombre, String dosis, Frecuencia frecuencia) {
-        this.id = id;
+    public Medicamento(String nombre, String dosis, Frecuencia frecuencia) {
         this.nombre = nombre;
         this.dosis = dosis;
         this.frecuencia = frecuencia;

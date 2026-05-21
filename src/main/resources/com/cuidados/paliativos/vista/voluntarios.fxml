@@ -1,14 +1,171 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.cuidados.paliativos.ong.vista.Voluntarios"
-            prefHeight="400.0" prefWidth="600.0">
+<BorderPane prefHeight="550"
+            prefWidth="900"
+            style="-fx-background-color: #2C3E50;"
+            xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.cuidados.paliativos.controlador.ControladorVoluntarios">
 
-</AnchorPane>
+    <!-- ENCABEZADO -->
+    <top>
+        <HBox alignment="CENTER_LEFT"
+              spacing="10"
+              style="-fx-background-color: #34495E; -fx-padding: 10;">
+
+            <Label text="Gestión de Voluntarios"
+                   style="-fx-text-fill: white;
+                          -fx-font-size: 18px;
+                          -fx-font-weight: bold;"/>
+        </HBox>
+    </top>
+
+    <!-- CONTENIDO -->
+    <center>
+
+        <VBox alignment="TOP_CENTER" spacing="15">
+
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+
+            <!-- FORMULARIO -->
+            <GridPane hgap="15" vgap="10">
+
+                <columnConstraints>
+                    <ColumnConstraints halignment="RIGHT" minWidth="150"/>
+                    <ColumnConstraints halignment="LEFT" minWidth="250"/>
+                </columnConstraints>
+
+                <!-- NOMBRE -->
+                <Label text="Nombre:"
+                       style="-fx-text-fill: white;"/>
+
+                <TextField fx:id="txtNombre"
+                           prefWidth="250"
+                           GridPane.columnIndex="1"/>
+
+                <!-- APELLIDO -->
+                <Label text="Apellido:"
+                       style="-fx-text-fill: white;"
+                       GridPane.rowIndex="1"/>
+
+                <TextField fx:id="txtApellido"
+                           prefWidth="250"
+                           GridPane.columnIndex="1"
+                           GridPane.rowIndex="1"/>
+
+                <!-- AREA -->
+                <Label text="Área:"
+                       style="-fx-text-fill: white;"
+                       GridPane.rowIndex="2"/>
+
+                <ComboBox fx:id="cbArea"
+                          prefWidth="250"
+                          promptText="Seleccione un área"
+                          GridPane.columnIndex="1"
+                          GridPane.rowIndex="2"/>
+
+                <!-- TELEFONO -->
+                <Label text="Teléfono:"
+                       style="-fx-text-fill: white;"
+                       GridPane.rowIndex="3"/>
+
+                <TextField fx:id="txtTelefono"
+                           prefWidth="250"
+                           GridPane.columnIndex="1"
+                           GridPane.rowIndex="3"/>
+
+                <!-- USUARIO -->
+                <Label text="Usuario:"
+                       style="-fx-text-fill: white;"
+                       GridPane.rowIndex="4"/>
+
+                <ComboBox fx:id="cbUsuario"
+                          prefWidth="250"
+                          promptText="Seleccione un usuario"
+                          GridPane.columnIndex="1"
+                          GridPane.rowIndex="4"/>
+
+            </GridPane>
+
+            <!-- BOTONES -->
+            <HBox alignment="CENTER" spacing="10">
+
+                <Button text="Nuevo"
+                        onAction="#nuevoVoluntario"
+                        style="-fx-background-color: #2980B9;
+                               -fx-text-fill: white;
+                               -fx-font-weight: bold;"/>
+
+                <Button text="Guardar"
+                        onAction="#guardarVoluntario"
+                        style="-fx-background-color: #27AE60;
+                               -fx-text-fill: white;
+                               -fx-font-weight: bold;"/>
+
+                <Button text="Modificar"
+                        onAction="#modificarVoluntario"
+                        style="-fx-background-color: #F39C12;
+                               -fx-text-fill: white;
+                               -fx-font-weight: bold;"/>
+
+                <Button text="Eliminar"
+                        onAction="#eliminarVoluntario"
+                        style="-fx-background-color: #E74C3C;
+                               -fx-text-fill: white;
+                               -fx-font-weight: bold;"/>
+
+                <Button text="Consultar"
+                        onAction="#consultarVoluntario"
+                        style="-fx-background-color: #8E44AD;
+                               -fx-text-fill: white;
+                               -fx-font-weight: bold;"/>
+
+            </HBox>
+
+            <!-- TABLA -->
+            <TableView fx:id="tablaVoluntarios"
+                       prefWidth="850"
+                       style="-fx-background-color: #ECF0F1;
+                              -fx-border-radius: 5;">
+
+                <columns>
+
+                    <TableColumn fx:id="colId"
+                                 text="ID"
+                                 prefWidth="60"/>
+
+                    <TableColumn fx:id="colNombre"
+                                 text="Nombre"
+                                 prefWidth="140"/>
+
+                    <TableColumn fx:id="colApellido"
+                                 text="Apellido"
+                                 prefWidth="140"/>
+
+                    <TableColumn fx:id="colArea"
+                                 text="Área"
+                                 prefWidth="180"/>
+
+                    <TableColumn fx:id="colTelefono"
+                                 text="Teléfono"
+                                 prefWidth="140"/>
+
+                    <TableColumn fx:id="colUsuario"
+                                 text="Usuario"
+                                 prefWidth="180"/>
+
+                </columns>
+
+            </TableView>
+
+        </VBox>
+
+    </center>
+
+</BorderPane>

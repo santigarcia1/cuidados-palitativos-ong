@@ -1,14 +1,76 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.cuidados.paliativos.ong.vista.Dietas"
-            prefHeight="400.0" prefWidth="600.0">
+<BorderPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.cuidados.paliativos.controlador.ControladorDieta"
+            prefWidth="800" prefHeight="550"
+            style="-fx-background-color: #2C3E50;">
 
-</AnchorPane>
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="10"
+              style="-fx-background-color: #34495E; -fx-padding: 10;">
+            <Label text="Gestión de Dietas"
+                   style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+        </HBox>
+    </top>
+
+    <center>
+        <VBox alignment="TOP_CENTER" spacing="15">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+
+            <GridPane hgap="15" vgap="10">
+                <columnConstraints>
+                    <ColumnConstraints halignment="RIGHT" minWidth="150"/>
+                    <ColumnConstraints halignment="LEFT" minWidth="250"/>
+                </columnConstraints>
+
+                <!-- Campos principales -->
+                <Label text="Nombre de la dieta:" style="-fx-text-fill: white;"/>
+                <TextField fx:id="txtNombreDieta" prefWidth="250" GridPane.columnIndex="1"/>
+
+                <Label text="Descripción:" style="-fx-text-fill: white;" GridPane.rowIndex="1"/>
+                <TextArea fx:id="txtDescripcion" prefWidth="250" prefHeight="60"
+                          GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                <Label text="Tipo de dieta:" style="-fx-text-fill: white;" GridPane.rowIndex="2"/>
+                <ComboBox fx:id="cbTipoDieta" prefWidth="250"
+                          GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+            </GridPane>
+
+            <!-- BOTONES -->
+            <HBox alignment="CENTER" spacing="10">
+                <Button text="Nuevo" onAction="#nuevaDieta"
+                        style="-fx-background-color: #2980B9; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                <Button text="Guardar" onAction="#guardarDieta"
+                        style="-fx-background-color: #27AE60; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                <Button text="Modificar" onAction="#modificarDieta"
+                        style="-fx-background-color: #F39C12; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                <Button text="Eliminar" onAction="#eliminarDieta"
+                        style="-fx-background-color: #E74C3C; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                <Button text="Consultar" onAction="#consultarDieta"
+                        style="-fx-background-color: #8E44AD; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                <Button text="Detalles" onAction="#abrirDetalleDieta"
+                        style="-fx-background-color: #16A085; -fx-text-fill: white; -fx-font-weight: bold;"/>
+            </HBox>
+
+            <!-- TABLA -->
+            <TableView fx:id="tablaDietas" prefWidth="700"
+                       style="-fx-background-color: #ECF0F1; -fx-border-radius: 5;">
+                <columns>
+                    <TableColumn fx:id="colId" text="ID" prefWidth="60"/>
+                    <TableColumn fx:id="colNombre" text="Nombre" prefWidth="150"/>
+                    <TableColumn fx:id="colDescripcion" text="Descripción" prefWidth="250"/>
+                    <TableColumn fx:id="colTipo" text="Tipo de Dieta" prefWidth="150"/>
+                </columns>
+            </TableView>
+
+        </VBox>
+    </center>
+
+</BorderPane>
