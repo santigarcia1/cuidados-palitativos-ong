@@ -14,12 +14,30 @@
     <left>
         <VBox alignment="TOP_CENTER" prefWidth="200" spacing="10" style="-fx-background-color: #2C3E50;">
             <Label style="-fx-text-fill: white; -fx-font-size: 16px; -fx-padding: 10;" text="Menú Principal" />
-            <Button onAction="#abrirPacientes" prefWidth="180" text="Pacientes" />
-            <Button onAction="#abrirProfesionales" prefWidth="180" text="Profesionales" />
-            <Button onAction="#abrirVoluntarios" prefWidth="180" text="Voluntarios" />
-            <Button onAction="#abrirPlanes" prefWidth="180" text="Planes de Cuidado" />
-            <Button onAction="#abrirDietas" prefWidth="180" text="Dietas" />
-            <Button onAction="#abrirMedicamentos" prefWidth="180" text="Medicamentos" />
+            <Button fx:id="btnPacientes"
+                    onAction="#abrirPacientes"
+                    prefWidth="180"
+                    text="Pacientes" />
+            <Button fx:id="btnProfesionales"
+                    onAction="#abrirProfesionales"
+                    prefWidth="180"
+                    text="Profesionales" />
+            <Button fx:id="btnVoluntarios"
+                    onAction="#abrirVoluntarios"
+                    prefWidth="180"
+                    text="Voluntarios" />
+            <Button fx:id="btnPlanes"
+                    onAction="#abrirPlanes"
+                    prefWidth="180"
+                    text="Planes de Cuidado" />
+            <Button fx:id="btnDietas"
+                    onAction="#abrirDietas"
+                    prefWidth="180"
+                    text="Dietas" />
+            <Button fx:id="btnMedicamentos"
+                    onAction="#abrirMedicamentos"
+                    prefWidth="180"
+                    text="Medicamentos" />
             <Region VBox.vgrow="ALWAYS" />
             <Button onAction="#cerrarSesion" prefWidth="180" style="-fx-background-color: #E74C3C; -fx-text-fill: white;" text="Cerrar Sesión" />
         </VBox>

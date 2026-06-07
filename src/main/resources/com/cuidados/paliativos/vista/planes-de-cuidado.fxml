@@ -58,14 +58,18 @@
                 <Label style="-fx-text-fill: white;" text="Medicamentos:" GridPane.rowIndex="4" />
                 <HBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="4">
                     <ComboBox fx:id="cbMedicamentos" prefWidth="250" promptText="Seleccione un medicamento" />
-                    <Button onAction="#crearNuevoMedicamento" style="-fx-background-color: #27AE60; -fx-text-fill: white; -fx-font-weight: bold;" text="+" />
+                    <Button fx:id="btnNuevoMedicamento"
+                            onAction="#crearNuevoMedicamento"
+                            text="+"/>
                 </HBox>
 
                 <!-- Dietas -->
                 <Label style="-fx-text-fill: white;" text="Dietas:" GridPane.rowIndex="5" />
                 <HBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="5">
                     <ComboBox fx:id="cbDietas" prefWidth="250" promptText="Seleccione una dieta" />
-                    <Button onAction="#crearNuevaDieta" style="-fx-background-color: #27AE60; -fx-text-fill: white; -fx-font-weight: bold;" text="+" />
+                    <Button fx:id="btnNuevaDieta"
+                            onAction="#crearNuevaDieta"
+                            text="+"/>
                 </HBox>
             <rowConstraints>
                <RowConstraints />
@@ -79,9 +83,17 @@
 
             <!-- BOTONES PRINCIPALES -->
             <HBox alignment="CENTER" spacing="10">
-                <Button onAction="#nuevoPlan" style="-fx-background-color: #2980B9; -fx-text-fill: white; -fx-font-weight: bold;" text="Nuevo" />
-                <Button onAction="#guardarPlan" style="-fx-background-color: #27AE60; -fx-text-fill: white; -fx-font-weight: bold;" text="Guardar" />
-                <Button onAction="#eliminarPlan" style="-fx-background-color: #E74C3C; -fx-text-fill: white; -fx-font-weight: bold;" text="Eliminar" />
+                <Button fx:id="btnNuevo"
+                        onAction="#nuevoPlan"
+                        text="Nuevo"/>
+
+                <Button fx:id="btnGuardar"
+                        onAction="#guardarPlan"
+                        text="Guardar"/>
+
+                <Button fx:id="btnEliminar"
+                        onAction="#eliminarPlan"
+                        text="Eliminar"/>
             </HBox>
 
             <!-- TABLA DE PLANES -->

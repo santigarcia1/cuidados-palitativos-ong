@@ -2,6 +2,9 @@ package com.cuidados.paliativos.controlador;
 
 import com.cuidados.paliativos.modelo.Medicamento;
 import com.cuidados.paliativos.modelo.Frecuencia;
+import com.cuidados.paliativos.modelo.Usuario;
+import com.cuidados.paliativos.seguridad.Permisos;
+import com.cuidados.paliativos.seguridad.Sesion;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -33,11 +36,28 @@ public class ControladorMedicamento {
     @FXML
     private TableColumn<Medicamento, String> colFrecuencia;
 
+    @FXML
+    private Button btnNuevo;
+
+    @FXML
+    private Button btnGuardar;
+
+    @FXML
+    private Button btnModificar;
+
+    @FXML
+    private Button btnEliminar;
+
+    @FXML
+    private Button btnConsultar;
+
     private final ObservableList<Medicamento> listaMedicamentos = FXCollections.observableArrayList();
     private final ObservableList<Frecuencia> listaFrecuencias = FXCollections.observableArrayList();
 
     @FXML
     private void initialize() {
+        configurarPermisos();
+
         // Frecuencias de ejemplo (podrían venir de BD)
         listaFrecuencias.addAll(
                 new Frecuencia(1L, "Diaria"),
@@ -81,6 +101,10 @@ public class ControladorMedicamento {
 
     @FXML
     private void guardarMedicamento() {
+        if (!tienePermisoEdicion()) {
+            return;
+        }
+
         if (txtNombreMedicamento.getText().isEmpty() ||
                 txtDosis.getText().isEmpty() ||
                 cbFrecuencia.getValue() == null) {
@@ -101,6 +125,10 @@ public class ControladorMedicamento {
 
     @FXML
     private void modificarMedicamento() {
+        if (!tienePermisoEdicion()) {
+            return;
+        }
+
         Medicamento seleccionado = tablaMedicamentos.getSelectionModel().getSelectedItem();
         if (seleccionado != null) {
             seleccionado.setNombre(txtNombreMedicamento.getText());
@@ -115,6 +143,10 @@ public class ControladorMedicamento {
 
     @FXML
     private void eliminarMedicamento() {
+        if (!tienePermisoEdicion()) {
+            return;
+        }
+
         Medicamento seleccionado = tablaMedicamentos.getSelectionModel().getSelectedItem();
         if (seleccionado != null) {
             listaMedicamentos.remove(seleccionado);
@@ -147,5 +179,40 @@ public class ControladorMedicamento {
         alerta.setHeaderText(null);
         alerta.setContentText(mensaje);
         alerta.showAndWait();
+    }
+
+    private void configurarPermisos() {
+        Usuario usuario = Sesion.getUsuarioLogueado();
+
+        if (usuario == null) {
+            return;
+        }
+
+        if (Permisos.esVoluntario(usuario) ||
+                Permisos.esAdministrativo(usuario)) {
+
+            btnNuevo.setDisable(true);
+            btnGuardar.setDisable(true);
+            btnModificar.setDisable(true);
+            btnEliminar.setDisable(true);
+
+            btnConsultar.setDisable(true);
+        }
+    }
+
+    private boolean tienePermisoEdicion() {
+        Usuario usuario = Sesion.getUsuarioLogueado();
+
+        if (Permisos.esVoluntario(usuario) ||
+                Permisos.esAdministrativo(usuario)) {
+
+            mostrarAlerta(
+                    "No posee permisos para acceder a esta funcionalidad."
+            );
+
+            return false;
+        }
+
+        return true;
     }
 }

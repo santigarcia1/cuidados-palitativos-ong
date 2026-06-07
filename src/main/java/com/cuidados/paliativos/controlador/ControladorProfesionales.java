@@ -3,6 +3,8 @@ package com.cuidados.paliativos.controlador;
 import com.cuidados.paliativos.modelo.Especialidad;
 import com.cuidados.paliativos.modelo.Profesional;
 import com.cuidados.paliativos.modelo.Usuario;
+import com.cuidados.paliativos.seguridad.Permisos;
+import com.cuidados.paliativos.seguridad.Sesion;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -47,6 +49,21 @@ public class ControladorProfesionales {
     @FXML
     private TableColumn<Profesional, String> colUsuario;
 
+    @FXML
+    private Button btnNuevo;
+
+    @FXML
+    private Button btnGuardar;
+
+    @FXML
+    private Button btnModificar;
+
+    @FXML
+    private Button btnEliminar;
+
+    @FXML
+    private Button btnConsultar;
+
     private final ObservableList<Profesional> listaProfesionales =
             FXCollections.observableArrayList();
 
@@ -58,6 +75,7 @@ public class ControladorProfesionales {
 
     @FXML
     private void initialize() {
+        configurarPermisos();
 
         // DATOS DE EJEMPLO
 
@@ -169,11 +187,19 @@ public class ControladorProfesionales {
 
     @FXML
     private void nuevoProfesional() {
+        if (!tienePermisoGestion()) {
+            mostrarAlerta("No posee permisos para realizar esta acción.");
+            return;
+        }
         limpiarCampos();
     }
 
     @FXML
     private void guardarProfesional() {
+        if (!tienePermisoGestion()) {
+            mostrarAlerta("No posee permisos para realizar esta acción.");
+            return;
+        }
 
         if (txtNombre.getText().isEmpty() ||
                 txtApellido.getText().isEmpty() ||
@@ -201,6 +227,10 @@ public class ControladorProfesionales {
 
     @FXML
     private void modificarProfesional() {
+        if (!tienePermisoGestion()) {
+            mostrarAlerta("No posee permisos para realizar esta acción.");
+            return;
+        }
 
         Profesional seleccionado =
                 tablaProfesionales.getSelectionModel().getSelectedItem();
@@ -224,6 +254,10 @@ public class ControladorProfesionales {
 
     @FXML
     private void eliminarProfesional() {
+        if (!tienePermisoGestion()) {
+            mostrarAlerta("No posee permisos para realizar esta acción.");
+            return;
+        }
 
         Profesional seleccionado =
                 tablaProfesionales.getSelectionModel().getSelectedItem();
@@ -276,5 +310,37 @@ public class ControladorProfesionales {
         alerta.setContentText(mensaje);
 
         alerta.showAndWait();
+    }
+
+    private boolean tienePermisoGestion() {
+
+        Usuario usuario = Sesion.getUsuarioLogueado();
+
+        return Permisos.esAdministrador(usuario)
+                || Permisos.esAdministrativo(usuario);
+    }
+
+    private void configurarPermisos() {
+
+        Usuario usuario = Sesion.getUsuarioLogueado();
+
+        if (usuario == null) {
+            return;
+        }
+
+        if (!tienePermisoGestion()) {
+
+            btnNuevo.setDisable(true);
+            btnGuardar.setDisable(true);
+            btnModificar.setDisable(true);
+            btnEliminar.setDisable(true);
+
+            txtNombre.setEditable(false);
+            txtApellido.setEditable(false);
+            txtTelefono.setEditable(false);
+
+            cbEspecialidad.setDisable(true);
+            cbUsuario.setDisable(true);
+        }
     }
 }

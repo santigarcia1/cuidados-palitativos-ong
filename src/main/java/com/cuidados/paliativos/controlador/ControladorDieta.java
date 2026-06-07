@@ -2,6 +2,9 @@ package com.cuidados.paliativos.controlador;
 
 import com.cuidados.paliativos.modelo.Dieta;
 import com.cuidados.paliativos.modelo.TipoDieta;
+import com.cuidados.paliativos.modelo.Usuario;
+import com.cuidados.paliativos.seguridad.Permisos;
+import com.cuidados.paliativos.seguridad.Sesion;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -37,11 +40,31 @@ public class ControladorDieta {
     @FXML
     private TableColumn<Dieta, String> colTipo;
 
+    @FXML
+    private Button btnNuevo;
+
+    @FXML
+    private Button btnGuardar;
+
+    @FXML
+    private Button btnModificar;
+
+    @FXML
+    private Button btnEliminar;
+
+    @FXML
+    private Button btnConsultar;
+
+    @FXML
+    private Button btnDetalles;
+
     private final ObservableList<Dieta> listaDietas = FXCollections.observableArrayList();
     private final ObservableList<TipoDieta> listaTiposDieta = FXCollections.observableArrayList();
 
     @FXML
     private void initialize() {
+        configurarPermisos();
+
         listaTiposDieta.addAll(
                 new TipoDieta() {{ setId(1L); setNombre("Blanda"); setDescripcion("Comidas suaves"); }},
                 new TipoDieta() {{ setId(2L); setNombre("Hipocalórica"); setDescripcion("Baja en calorías"); }},
@@ -78,6 +101,9 @@ public class ControladorDieta {
 
     @FXML
     private void nuevaDieta() {
+        if (!tienePermisoEdicion()) {
+            return;
+        }
         limpiarCampos();
     }
 
@@ -100,6 +126,10 @@ public class ControladorDieta {
 
     @FXML
     private void modificarDieta() {
+        if (!tienePermisoEdicion()) {
+            return;
+        }
+
         Dieta seleccionada = tablaDietas.getSelectionModel().getSelectedItem();
         if (seleccionada != null) {
             seleccionada.setNombre(txtNombreDieta.getText());
@@ -114,6 +144,10 @@ public class ControladorDieta {
 
     @FXML
     private void eliminarDieta() {
+        if (!tienePermisoEdicion()) {
+            return;
+        }
+
         Dieta seleccionada = tablaDietas.getSelectionModel().getSelectedItem();
         if (seleccionada != null) {
             listaDietas.remove(seleccionada);
@@ -136,6 +170,10 @@ public class ControladorDieta {
 
     @FXML
     private void abrirDetalleDieta() {
+        if (!tienePermisoEdicion()) {
+            return;
+        }
+
         Dieta seleccionada = tablaDietas.getSelectionModel().getSelectedItem();
         if (seleccionada == null) {
             mostrarAlerta("Seleccione una dieta para gestionar sus horarios.");
@@ -169,5 +207,40 @@ public class ControladorDieta {
         alert.setHeaderText(null);
         alert.setContentText(msg);
         alert.showAndWait();
+    }
+
+    private void configurarPermisos() {
+        Usuario usuario = Sesion.getUsuarioLogueado();
+
+        if (usuario == null) {
+            return;
+        }
+
+        if (Permisos.esVoluntario(usuario) ||
+                Permisos.esAdministrativo(usuario)) {
+
+            btnNuevo.setDisable(true);
+            btnGuardar.setDisable(true);
+            btnModificar.setDisable(true);
+            btnEliminar.setDisable(true);
+            btnConsultar.setDisable(true);
+            btnDetalles.setDisable(true);
+        }
+    }
+
+    private boolean tienePermisoEdicion() {
+        Usuario usuario = Sesion.getUsuarioLogueado();
+
+        if (Permisos.esVoluntario(usuario) ||
+                Permisos.esAdministrativo(usuario)) {
+
+            mostrarAlerta(
+                    "No posee permisos para acceder a esta funcionalidad."
+            );
+
+            return false;
+        }
+
+        return true;
     }
 }
