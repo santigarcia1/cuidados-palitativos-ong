@@ -50,16 +50,25 @@
 
             <!-- BOTONES -->
             <HBox alignment="CENTER" spacing="10">
-                <Button text="Nuevo" onAction="#nuevoMedicamento"
-                        style="-fx-background-color: #2980B9; -fx-text-fill: white; -fx-font-weight: bold;"/>
-                <Button text="Guardar" onAction="#guardarMedicamento"
-                        style="-fx-background-color: #27AE60; -fx-text-fill: white; -fx-font-weight: bold;"/>
-                <Button text="Modificar" onAction="#modificarMedicamento"
-                        style="-fx-background-color: #F39C12; -fx-text-fill: white; -fx-font-weight: bold;"/>
-                <Button text="Eliminar" onAction="#eliminarMedicamento"
-                        style="-fx-background-color: #E74C3C; -fx-text-fill: white; -fx-font-weight: bold;"/>
-                <Button text="Consultar" onAction="#consultarMedicamento"
-                        style="-fx-background-color: #8E44AD; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                <Button fx:id="btnNuevo"
+                        text="Nuevo"
+                        onAction="#nuevoMedicamento"/>
+
+                <Button fx:id="btnGuardar"
+                        text="Guardar"
+                        onAction="#guardarMedicamento"/>
+
+                <Button fx:id="btnModificar"
+                        text="Modificar"
+                        onAction="#modificarMedicamento"/>
+
+                <Button fx:id="btnEliminar"
+                        text="Eliminar"
+                        onAction="#eliminarMedicamento"/>
+
+                <Button fx:id="btnConsultar"
+                        text="Consultar"
+                        onAction="#consultarMedicamento"/>
             </HBox>
 
             <!-- TABLA DE MEDICAMENTOS -->

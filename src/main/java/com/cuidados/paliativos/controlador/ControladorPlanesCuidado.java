@@ -1,5 +1,9 @@
 package com.cuidados.paliativos.controlador;
 
+import com.cuidados.paliativos.modelo.Usuario;
+import com.cuidados.paliativos.seguridad.Permisos;
+import com.cuidados.paliativos.seguridad.Sesion;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -34,6 +38,21 @@ public class ControladorPlanesCuidado {
     @FXML private TableColumn<PlanCuidadoDTO, String> colFecha;
     @FXML private TableColumn<PlanCuidadoDTO, String> colObservaciones;
 
+    @FXML
+    private Button btnNuevo;
+
+    @FXML
+    private Button btnGuardar;
+
+    @FXML
+    private Button btnEliminar;
+
+    @FXML
+    private Button btnNuevoMedicamento;
+
+    @FXML
+    private Button btnNuevaDieta;
+
     // --- Datos simulados ---
     private final ObservableList<String> pacientes = FXCollections.observableArrayList("Juan Pérez", "María Gómez");
     private final ObservableList<String> profesionales = FXCollections.observableArrayList("Dr. López", "Dra. Martínez");
@@ -45,6 +64,8 @@ public class ControladorPlanesCuidado {
     // --- Inicialización ---
     @FXML
     public void initialize() {
+        configurarPermisos();
+
         cbPacientes.setItems(pacientes);
         cbProfesionales.setItems(profesionales);
         cbMedicamentos.setItems(medicamentos);
@@ -64,6 +85,14 @@ public class ControladorPlanesCuidado {
     // --- Acciones de botones ---
     @FXML
     private void nuevoPlan() {
+        if (!puedeGestionarPlanes()) {
+            mostrarAlerta(
+                    "No posee permisos para realizar esta acción.",
+                    Alert.AlertType.WARNING
+            );
+            return;
+        }
+
         cbPacientes.getSelectionModel().clearSelection();
         cbProfesionales.getSelectionModel().clearSelection();
         cbMedicamentos.getSelectionModel().clearSelection();
@@ -74,6 +103,14 @@ public class ControladorPlanesCuidado {
 
     @FXML
     private void guardarPlan() {
+        if (!puedeGestionarPlanes()) {
+            mostrarAlerta(
+                    "No posee permisos para realizar esta acción.",
+                    Alert.AlertType.WARNING
+            );
+            return;
+        }
+
         String paciente = cbPacientes.getValue();
         String profesional = cbProfesionales.getValue();
         String fecha = dpFechaCreacion.getValue().toString();
@@ -103,6 +140,14 @@ public class ControladorPlanesCuidado {
     @FXML
     private void crearNuevoMedicamento() {
         try {
+            if (!puedeGestionarPlanes()) {
+                mostrarAlerta(
+                        "No posee permisos para realizar esta acción.",
+                        Alert.AlertType.WARNING
+                );
+                return;
+            }
+
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/cuidados/paliativos/vista/medicamentos.fxml"));
             Parent root = loader.load();
             Stage stage = new Stage();
@@ -117,6 +162,14 @@ public class ControladorPlanesCuidado {
     @FXML
     private void crearNuevaDieta() {
         try {
+            if (!puedeGestionarPlanes()) {
+                mostrarAlerta(
+                        "No posee permisos para realizar esta acción.",
+                        Alert.AlertType.WARNING
+                );
+                return;
+            }
+
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/cuidados/paliativos/vista/dietas.fxml"));
             Parent root = loader.load();
             Stage stage = new Stage();
@@ -155,5 +208,41 @@ public class ControladorPlanesCuidado {
         public javafx.beans.property.StringProperty profesionalProperty() { return profesional; }
         public javafx.beans.property.StringProperty fechaProperty() { return fecha; }
         public javafx.beans.property.StringProperty observacionesProperty() { return observaciones; }
+    }
+
+    private boolean puedeGestionarPlanes() {
+
+        Usuario usuario = Sesion.getUsuarioLogueado();
+
+        return Permisos.esAdministrador(usuario)
+                || Permisos.esProfesional(usuario);
+    }
+
+    private void configurarPermisos() {
+
+        Usuario usuario = Sesion.getUsuarioLogueado();
+
+        if (usuario == null) {
+            return;
+        }
+
+        if (!puedeGestionarPlanes()) {
+
+            btnNuevo.setDisable(true);
+            btnGuardar.setDisable(true);
+            btnEliminar.setDisable(true);
+
+            btnNuevoMedicamento.setDisable(true);
+            btnNuevaDieta.setDisable(true);
+
+            cbPacientes.setDisable(true);
+            cbProfesionales.setDisable(true);
+            cbMedicamentos.setDisable(true);
+            cbDietas.setDisable(true);
+
+            dpFechaCreacion.setDisable(true);
+
+            txtObservaciones.setEditable(false);
+        }
     }
 }

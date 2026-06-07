@@ -2,6 +2,9 @@ package com.cuidados.paliativos.controlador;
 
 import com.cuidados.paliativos.modelo.EstadoUsuario;
 import com.cuidados.paliativos.modelo.Paciente;
+import com.cuidados.paliativos.modelo.Usuario;
+import com.cuidados.paliativos.seguridad.Permisos;
+import com.cuidados.paliativos.seguridad.Sesion;
 
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -57,6 +60,21 @@ public class ControladorPacientes {
     @FXML
     private TableColumn<Paciente, String> colEstado;
 
+    @FXML
+    private Button btnNuevo;
+
+    @FXML
+    private Button btnGuardar;
+
+    @FXML
+    private Button btnModificar;
+
+    @FXML
+    private Button btnEliminar;
+
+    @FXML
+    private Button btnConsultar;
+
     private final ObservableList<Paciente> listaPacientes =
             FXCollections.observableArrayList();
 
@@ -65,6 +83,7 @@ public class ControladorPacientes {
 
     @FXML
     private void initialize() {
+        configurarPermisos();
 
         EstadoUsuario e1 = new EstadoUsuario();
         e1.setId(1L);
@@ -122,11 +141,19 @@ public class ControladorPacientes {
 
     @FXML
     private void nuevoPaciente() {
+        if (!puedeModificar()) {
+            mostrarAlerta("No posee permisos para realizar esta acción.");
+            return;
+        }
         limpiarCampos();
     }
 
     @FXML
     private void guardarPaciente() {
+        if (!puedeModificar()) {
+            mostrarAlerta("No posee permisos para realizar esta acción.");
+            return;
+        }
 
         if (txtNombre.getText().isEmpty() ||
                 txtApellido.getText().isEmpty() ||
@@ -165,6 +192,10 @@ public class ControladorPacientes {
 
     @FXML
     private void modificarPaciente() {
+        if (!puedeModificar()) {
+            mostrarAlerta("No posee permisos para realizar esta acción.");
+            return;
+        }
 
         Paciente seleccionado =
                 tablaPacientes.getSelectionModel().getSelectedItem();
@@ -198,6 +229,10 @@ public class ControladorPacientes {
 
     @FXML
     private void eliminarPaciente() {
+        if (!puedeModificar()) {
+            mostrarAlerta("No posee permisos para realizar esta acción.");
+            return;
+        }
 
         Paciente seleccionado =
                 tablaPacientes.getSelectionModel().getSelectedItem();
@@ -264,5 +299,43 @@ public class ControladorPacientes {
         alerta.setContentText(mensaje);
 
         alerta.showAndWait();
+    }
+
+    private void configurarPermisos() {
+
+        Usuario usuario = Sesion.getUsuarioLogueado();
+
+        if (usuario == null) {
+            return;
+        }
+
+        /*
+         * PROFESIONAL Y VOLUNTARIO
+         * Solo consulta
+         */
+        if (Permisos.esProfesional(usuario)
+                || Permisos.esVoluntario(usuario)) {
+
+            btnNuevo.setDisable(true);
+            btnGuardar.setDisable(true);
+            btnModificar.setDisable(true);
+            btnEliminar.setDisable(true);
+
+            txtNombre.setEditable(false);
+            txtApellido.setEditable(false);
+            txtDireccion.setEditable(false);
+            txtTelefono.setEditable(false);
+
+            dpFechaNacimiento.setDisable(true);
+            cbEstado.setDisable(true);
+        }
+    }
+
+    private boolean puedeModificar() {
+
+        Usuario usuario = Sesion.getUsuarioLogueado();
+
+        return Permisos.esAdministrador(usuario)
+                || Permisos.esAdministrativo(usuario);
     }
 }

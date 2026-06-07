@@ -3,6 +3,8 @@ package com.cuidados.paliativos.controlador;
 import com.cuidados.paliativos.modelo.Area;
 import com.cuidados.paliativos.modelo.Usuario;
 import com.cuidados.paliativos.modelo.Voluntario;
+import com.cuidados.paliativos.seguridad.Permisos;
+import com.cuidados.paliativos.seguridad.Sesion;
 
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -49,6 +51,21 @@ public class ControladorVoluntarios {
     @FXML
     private TableColumn<Voluntario, String> colUsuario;
 
+    @FXML
+    private Button btnNuevo;
+
+    @FXML
+    private Button btnGuardar;
+
+    @FXML
+    private Button btnModificar;
+
+    @FXML
+    private Button btnEliminar;
+
+    @FXML
+    private Button btnConsultar;
+
     private final ObservableList<Voluntario> listaVoluntarios =
             FXCollections.observableArrayList();
 
@@ -60,6 +77,7 @@ public class ControladorVoluntarios {
 
     @FXML
     private void initialize() {
+        configurarPermisos();
 
         // AREAS
 
@@ -185,11 +203,19 @@ public class ControladorVoluntarios {
 
     @FXML
     private void nuevoVoluntario() {
+        if (!tienePermisoGestion()) {
+            mostrarAlerta("No posee permisos para realizar esta acción.");
+            return;
+        }
         limpiarCampos();
     }
 
     @FXML
     private void guardarVoluntario() {
+        if (!tienePermisoGestion()) {
+            mostrarAlerta("No posee permisos para realizar esta acción.");
+            return;
+        }
 
         if (txtNombre.getText().isEmpty() ||
                 txtApellido.getText().isEmpty() ||
@@ -217,6 +243,10 @@ public class ControladorVoluntarios {
 
     @FXML
     private void modificarVoluntario() {
+        if (!tienePermisoGestion()) {
+            mostrarAlerta("No posee permisos para realizar esta acción.");
+            return;
+        }
 
         Voluntario seleccionado =
                 tablaVoluntarios.getSelectionModel().getSelectedItem();
@@ -240,6 +270,10 @@ public class ControladorVoluntarios {
 
     @FXML
     private void eliminarVoluntario() {
+        if (!tienePermisoGestion()) {
+            mostrarAlerta("No posee permisos para realizar esta acción.");
+            return;
+        }
 
         Voluntario seleccionado =
                 tablaVoluntarios.getSelectionModel().getSelectedItem();
@@ -292,5 +326,36 @@ public class ControladorVoluntarios {
         alerta.setContentText(mensaje);
 
         alerta.showAndWait();
+    }
+
+    private boolean tienePermisoGestion() {
+
+        Usuario usuario = Sesion.getUsuarioLogueado();
+
+        return Permisos.esAdministrador(usuario)
+                || Permisos.esAdministrativo(usuario);
+    }
+
+    private void configurarPermisos() {
+        Usuario usuario = Sesion.getUsuarioLogueado();
+
+        if (usuario == null) {
+            return;
+        }
+
+        if (!tienePermisoGestion()) {
+
+            btnNuevo.setDisable(true);
+            btnGuardar.setDisable(true);
+            btnModificar.setDisable(true);
+            btnEliminar.setDisable(true);
+
+            txtNombre.setEditable(false);
+            txtApellido.setEditable(false);
+            txtTelefono.setEditable(false);
+
+            cbArea.setDisable(true);
+            cbUsuario.setDisable(true);
+        }
     }
 }
