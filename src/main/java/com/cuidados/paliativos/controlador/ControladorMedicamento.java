@@ -182,7 +182,7 @@ public class ControladorMedicamento {
     }
 
     private void configurarPermisos() {
-        Usuario usuario = Sesion.getUsuarioLogueado();
+        Usuario usuario = Sesion.getInstancia().getUsuarioLogueado();
 
         if (usuario == null) {
             return;
@@ -201,7 +201,7 @@ public class ControladorMedicamento {
     }
 
     private boolean tienePermisoEdicion() {
-        Usuario usuario = Sesion.getUsuarioLogueado();
+        Usuario usuario = Sesion.getInstancia().getUsuarioLogueado();
 
         if (Permisos.esVoluntario(usuario) ||
                 Permisos.esAdministrativo(usuario)) {

@@ -29,7 +29,7 @@ public class ControladorLogin {
                         password,
                         usuario.getContrasena())) {
 
-            Sesion.setUsuarioLogueado(usuario);
+            Sesion.getInstancia().setUsuarioLogueado(usuario);
 
             try {
                 MainApp.showMainMenu();

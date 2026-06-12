@@ -314,7 +314,7 @@ public class ControladorProfesionales {
 
     private boolean tienePermisoGestion() {
 
-        Usuario usuario = Sesion.getUsuarioLogueado();
+        Usuario usuario = Sesion.getInstancia().getUsuarioLogueado();
 
         return Permisos.esAdministrador(usuario)
                 || Permisos.esAdministrativo(usuario);
@@ -322,7 +322,7 @@ public class ControladorProfesionales {
 
     private void configurarPermisos() {
 
-        Usuario usuario = Sesion.getUsuarioLogueado();
+        Usuario usuario = Sesion.getInstancia().getUsuarioLogueado();
 
         if (usuario == null) {
             return;

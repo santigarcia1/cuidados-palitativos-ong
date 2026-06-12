@@ -35,7 +35,7 @@ public class ControladorMenu {
     @FXML
     private void initialize() {
 
-        Usuario usuario = Sesion.getUsuarioLogueado();
+        Usuario usuario = Sesion.getInstancia().getUsuarioLogueado();
 
         if (usuario == null) {
             return;
@@ -122,7 +122,7 @@ public class ControladorMenu {
     @FXML
     private void abrirProfesionales() throws Exception {
 
-        Usuario usuario = Sesion.getUsuarioLogueado();
+        Usuario usuario = Sesion.getInstancia().getUsuarioLogueado();
 
         if (Permisos.esProfesional(usuario)
                 || Permisos.esVoluntario(usuario)) {
@@ -137,7 +137,7 @@ public class ControladorMenu {
     @FXML
     private void abrirVoluntarios() throws Exception {
 
-        Usuario usuario = Sesion.getUsuarioLogueado();
+        Usuario usuario = Sesion.getInstancia().getUsuarioLogueado();
 
         if (Permisos.esProfesional(usuario)
                 || Permisos.esVoluntario(usuario)) {
@@ -152,7 +152,7 @@ public class ControladorMenu {
     @FXML
     private void abrirPlanes() throws Exception {
 
-        Usuario usuario = Sesion.getUsuarioLogueado();
+        Usuario usuario = Sesion.getInstancia().getUsuarioLogueado();
 
         if (Permisos.esAdministrativo(usuario)) {
 
@@ -166,7 +166,7 @@ public class ControladorMenu {
     @FXML
     private void abrirDietas() throws Exception {
 
-        Usuario usuario = Sesion.getUsuarioLogueado();
+        Usuario usuario = Sesion.getInstancia().getUsuarioLogueado();
 
         if (Permisos.esAdministrativo(usuario)) {
 
@@ -180,7 +180,7 @@ public class ControladorMenu {
     @FXML
     private void abrirMedicamentos() throws Exception {
 
-        Usuario usuario = Sesion.getUsuarioLogueado();
+        Usuario usuario = Sesion.getInstancia().getUsuarioLogueado();
 
         if (Permisos.esAdministrativo(usuario)
                 || Permisos.esVoluntario(usuario)) {
@@ -195,7 +195,7 @@ public class ControladorMenu {
     @FXML
     private void cerrarSesion() throws Exception {
 
-        Sesion.cerrarSesion();
+        Sesion.getInstancia().cerrarSesion();
 
         MainApp.showLogin();
     }

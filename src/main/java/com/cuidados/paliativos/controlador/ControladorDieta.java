@@ -210,7 +210,7 @@ public class ControladorDieta {
     }
 
     private void configurarPermisos() {
-        Usuario usuario = Sesion.getUsuarioLogueado();
+        Usuario usuario = Sesion.getInstancia().getUsuarioLogueado();
 
         if (usuario == null) {
             return;
@@ -229,7 +229,7 @@ public class ControladorDieta {
     }
 
     private boolean tienePermisoEdicion() {
-        Usuario usuario = Sesion.getUsuarioLogueado();
+        Usuario usuario = Sesion.getInstancia().getUsuarioLogueado();
 
         if (Permisos.esVoluntario(usuario) ||
                 Permisos.esAdministrativo(usuario)) {

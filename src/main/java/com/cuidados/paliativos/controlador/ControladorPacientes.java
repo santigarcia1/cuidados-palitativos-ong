@@ -303,7 +303,7 @@ public class ControladorPacientes {
 
     private void configurarPermisos() {
 
-        Usuario usuario = Sesion.getUsuarioLogueado();
+        Usuario usuario = Sesion.getInstancia().getUsuarioLogueado();
 
         if (usuario == null) {
             return;
@@ -333,7 +333,7 @@ public class ControladorPacientes {
 
     private boolean puedeModificar() {
 
-        Usuario usuario = Sesion.getUsuarioLogueado();
+        Usuario usuario = Sesion.getInstancia().getUsuarioLogueado();
 
         return Permisos.esAdministrador(usuario)
                 || Permisos.esAdministrativo(usuario);
