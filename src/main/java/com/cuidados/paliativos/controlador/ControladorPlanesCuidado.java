@@ -212,7 +212,7 @@ public class ControladorPlanesCuidado {
 
     private boolean puedeGestionarPlanes() {
 
-        Usuario usuario = Sesion.getUsuarioLogueado();
+        Usuario usuario = Sesion.getInstancia().getUsuarioLogueado();
 
         return Permisos.esAdministrador(usuario)
                 || Permisos.esProfesional(usuario);
@@ -220,7 +220,7 @@ public class ControladorPlanesCuidado {
 
     private void configurarPermisos() {
 
-        Usuario usuario = Sesion.getUsuarioLogueado();
+        Usuario usuario = Sesion.getInstancia().getUsuarioLogueado();
 
         if (usuario == null) {
             return;

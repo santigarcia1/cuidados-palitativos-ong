@@ -4,20 +4,29 @@ import com.cuidados.paliativos.modelo.Usuario;
 
 public class Sesion {
 
-    private static Usuario usuarioLogueado;
+    private static Sesion instancia;
+
+    private Usuario usuarioLogueado;
 
     private Sesion() {
     }
 
-    public static Usuario getUsuarioLogueado() {
+    public static Sesion getInstancia() {
+        if (instancia == null) {
+            instancia = new Sesion();
+        }
+        return instancia;
+    }
+
+    public Usuario getUsuarioLogueado() {
         return usuarioLogueado;
     }
 
-    public static void setUsuarioLogueado(Usuario usuario) {
-        usuarioLogueado = usuario;
+    public void setUsuarioLogueado(Usuario usuarioLogueado) {
+        this.usuarioLogueado = usuarioLogueado;
     }
 
-    public static void cerrarSesion() {
+    public void cerrarSesion() {
         usuarioLogueado = null;
     }
 }
