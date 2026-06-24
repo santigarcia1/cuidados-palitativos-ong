@@ -177,8 +177,6 @@ public class ControladorPacientes {
                 });
 
         cargarPacientes();
-        tablaPacientes.setItems(listaPacientes);
-
         cargarEstados();
     }
 
@@ -189,7 +187,6 @@ public class ControladorPacientes {
             return;
         }
         limpiarCampos();
-        tablaPacientes.getSelectionModel().clearSelection();
     }
 
     @FXML
@@ -301,6 +298,7 @@ public class ControladorPacientes {
     private void cargarPacientes() {
         listaPacientes.clear();
         listaPacientes.addAll(pacienteDAO.listar());
+        tablaPacientes.setItems(listaPacientes);
     }
 
     private void cargarEstados() {

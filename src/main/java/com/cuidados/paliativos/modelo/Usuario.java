@@ -1,5 +1,7 @@
 package com.cuidados.paliativos.modelo;
 
+import java.util.Objects;
+
 public class Usuario {
     private Long id;
     private String email;
@@ -19,4 +21,23 @@ public class Usuario {
     public void setRol(Rol rol) { this.rol = rol; }
     public EstadoUsuario getEstado() { return estado; }
     public void setEstado(EstadoUsuario estado) { this.estado = estado; }
+
+    @Override
+    public boolean equals(Object o) {
+
+        if (this == o)
+            return true;
+
+        if (!(o instanceof Usuario))
+            return false;
+
+        Usuario usuario = (Usuario) o;
+
+        return Objects.equals(id, usuario.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }
