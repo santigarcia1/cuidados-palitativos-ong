@@ -106,7 +106,7 @@
             <HBox alignment="CENTER" spacing="10">
 
                 <Button fx:id="btnNuevo"
-                        text="Nuevo"
+                        text="Limpiar campos"
                         onAction="#nuevoPaciente"/>
 
                 <Button fx:id="btnGuardar"
@@ -120,10 +120,6 @@
                 <Button fx:id="btnEliminar"
                         text="Eliminar"
                         onAction="#eliminarPaciente"/>
-
-                <Button fx:id="btnConsultar"
-                        text="Consultar"
-                        onAction="#consultarPaciente"/>
 
             </HBox>
 

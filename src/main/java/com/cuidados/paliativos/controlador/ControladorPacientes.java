@@ -1,5 +1,9 @@
 package com.cuidados.paliativos.controlador;
 
+import com.cuidados.paliativos.dao.EstadoUsuarioDAO;
+import com.cuidados.paliativos.dao.EstadoUsuarioDAOImpl;
+import com.cuidados.paliativos.dao.PacienteDAO;
+import com.cuidados.paliativos.dao.PacienteDAOImpl;
 import com.cuidados.paliativos.modelo.EstadoUsuario;
 import com.cuidados.paliativos.modelo.Paciente;
 import com.cuidados.paliativos.modelo.Usuario;
@@ -13,7 +17,6 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
-import java.util.Date;
 import java.time.LocalDate;
 
 public class ControladorPacientes {
@@ -72,30 +75,21 @@ public class ControladorPacientes {
     @FXML
     private Button btnEliminar;
 
-    @FXML
-    private Button btnConsultar;
-
     private final ObservableList<Paciente> listaPacientes =
             FXCollections.observableArrayList();
 
     private final ObservableList<EstadoUsuario> listaEstados =
             FXCollections.observableArrayList();
 
+    private final PacienteDAO pacienteDAO =
+            new PacienteDAOImpl();
+
+    private final EstadoUsuarioDAO estadoDAO =
+            new EstadoUsuarioDAOImpl();
+
     @FXML
     private void initialize() {
         configurarPermisos();
-
-        EstadoUsuario e1 = new EstadoUsuario();
-        e1.setId(1L);
-        e1.setNombre("Activo");
-
-        EstadoUsuario e2 = new EstadoUsuario();
-        e2.setId(2L);
-        e2.setNombre("Inactivo");
-
-        listaEstados.addAll(e1, e2);
-
-        cbEstado.setItems(listaEstados);
 
         colId.setCellValueFactory(c ->
                 new SimpleLongProperty(
@@ -131,12 +125,61 @@ public class ControladorPacientes {
 
         colEstado.setCellValueFactory(c ->
                 new SimpleStringProperty(
-                        c.getValue().getEstado() != null
-                                ? c.getValue().getEstado().getNombre()
-                                : ""
+                        c.getValue().getEstado().getNombre()
                 ));
 
+        cbEstado.setCellFactory(param -> new ListCell<>() {
+            @Override
+            protected void updateItem(EstadoUsuario item, boolean empty) {
+                super.updateItem(item, empty);
+
+                setText(
+                        empty || item == null
+                                ? null
+                                : item.getNombre()
+                );
+            }
+        });
+
+        cbEstado.setButtonCell(new ListCell<>() {
+            @Override
+            protected void updateItem(EstadoUsuario item, boolean empty) {
+                super.updateItem(item, empty);
+
+                setText(
+                        empty || item == null
+                                ? null
+                                : item.getNombre()
+                );
+            }
+        });
+
+        tablaPacientes.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((observable, anterior, seleccionado) -> {
+                    if (seleccionado != null) {
+
+                        txtNombre.setText(seleccionado.getNombre());
+                        txtApellido.setText(seleccionado.getApellido());
+                        txtDireccion.setText(seleccionado.getDireccion());
+                        txtTelefono.setText(seleccionado.getTelefono());
+                        cbEstado.setValue(seleccionado.getEstado());
+
+                        if (seleccionado.getFechaNacimiento() != null) {
+                            java.sql.Date fecha =
+                                    (java.sql.Date) seleccionado.getFechaNacimiento();
+
+                            dpFechaNacimiento.setValue(
+                                    fecha.toLocalDate()
+                            );
+                        }
+                    }
+                });
+
+        cargarPacientes();
         tablaPacientes.setItems(listaPacientes);
+
+        cargarEstados();
     }
 
     @FXML
@@ -146,6 +189,7 @@ public class ControladorPacientes {
             return;
         }
         limpiarCampos();
+        tablaPacientes.getSelectionModel().clearSelection();
     }
 
     @FXML
@@ -185,8 +229,9 @@ public class ControladorPacientes {
         nuevo.setTelefono(txtTelefono.getText());
         nuevo.setEstado(cbEstado.getValue());
 
-        listaPacientes.add(nuevo);
+        pacienteDAO.guardar(nuevo);
 
+        cargarPacientes();
         limpiarCampos();
     }
 
@@ -199,6 +244,12 @@ public class ControladorPacientes {
 
         Paciente seleccionado =
                 tablaPacientes.getSelectionModel().getSelectedItem();
+
+        System.out.println(seleccionado.getNombre());
+        if (seleccionado.getEstado().getId().equals(2L)) {
+            mostrarAlerta("El paciente ya no se encuentra en la ONG.");
+            return;
+        }
 
         if (seleccionado != null) {
 
@@ -218,7 +269,8 @@ public class ControladorPacientes {
             seleccionado.setTelefono(txtTelefono.getText());
             seleccionado.setEstado(cbEstado.getValue());
 
-            tablaPacientes.refresh();
+            pacienteDAO.modificar(seleccionado);
+            cargarPacientes();
 
             limpiarCampos();
 
@@ -238,43 +290,23 @@ public class ControladorPacientes {
                 tablaPacientes.getSelectionModel().getSelectedItem();
 
         if (seleccionado != null) {
-
-            listaPacientes.remove(seleccionado);
-
+            pacienteDAO.eliminar(seleccionado.getId());
+            cargarPacientes();
+            limpiarCampos();
         } else {
             mostrarAlerta("Seleccione un paciente.");
         }
     }
 
-    @FXML
-    private void consultarPaciente() {
+    private void cargarPacientes() {
+        listaPacientes.clear();
+        listaPacientes.addAll(pacienteDAO.listar());
+    }
 
-        Paciente seleccionado =
-                tablaPacientes.getSelectionModel().getSelectedItem();
-
-        if (seleccionado != null) {
-
-            txtNombre.setText(seleccionado.getNombre());
-            txtApellido.setText(seleccionado.getApellido());
-
-            if (seleccionado.getFechaNacimiento() != null) {
-
-                dpFechaNacimiento.setValue(
-                        seleccionado.getFechaNacimiento()
-                                .toInstant()
-                                .atZone(java.time.ZoneId.systemDefault())
-                                .toLocalDate()
-                );
-            }
-
-            txtDireccion.setText(seleccionado.getDireccion());
-            txtTelefono.setText(seleccionado.getTelefono());
-
-            cbEstado.setValue(seleccionado.getEstado());
-
-        } else {
-            mostrarAlerta("Seleccione un paciente.");
-        }
+    private void cargarEstados() {
+        listaEstados.clear();
+        listaEstados.addAll(estadoDAO.listarTodos());
+        cbEstado.setItems(listaEstados);
     }
 
     private void limpiarCampos() {
@@ -288,6 +320,8 @@ public class ControladorPacientes {
         txtTelefono.clear();
 
         cbEstado.setValue(null);
+
+        tablaPacientes.getSelectionModel().clearSelection();
     }
 
     private void mostrarAlerta(String mensaje) {
