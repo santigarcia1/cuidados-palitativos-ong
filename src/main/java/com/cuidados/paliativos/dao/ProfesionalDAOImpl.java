@@ -101,7 +101,7 @@ public class ProfesionalDAOImpl implements ProfesionalDAO {
                 FROM profesionales p
                 JOIN especialidades e ON p.id_especialidad = e.id
                 JOIN usuarios u ON p.id_usuario = u.id
-                ORDER BY p.apellido, p.nombre
+                ORDER BY p.id
                 """;
 
         try (

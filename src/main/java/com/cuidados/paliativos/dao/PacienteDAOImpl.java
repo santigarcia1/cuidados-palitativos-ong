@@ -148,7 +148,8 @@ public class PacienteDAOImpl
                         "e.nombre AS nombre_estado " +
                         "FROM pacientes p " +
                         "INNER JOIN estado_usuario e " +
-                        "    ON p.id_estado = e.id;";
+                        "    ON p.id_estado = e.id " +
+                        "ORDER BY p.id;";
 
         try (
                 Connection con =
