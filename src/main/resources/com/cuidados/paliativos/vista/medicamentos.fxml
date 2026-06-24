@@ -51,7 +51,7 @@
             <!-- BOTONES -->
             <HBox alignment="CENTER" spacing="10">
                 <Button fx:id="btnNuevo"
-                        text="Nuevo"
+                        text="Limpiar campos"
                         onAction="#nuevoMedicamento"/>
 
                 <Button fx:id="btnGuardar"
@@ -66,9 +66,6 @@
                         text="Eliminar"
                         onAction="#eliminarMedicamento"/>
 
-                <Button fx:id="btnConsultar"
-                        text="Consultar"
-                        onAction="#consultarMedicamento"/>
             </HBox>
 
             <!-- TABLA DE MEDICAMENTOS -->

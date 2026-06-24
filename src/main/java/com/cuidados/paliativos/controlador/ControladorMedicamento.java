@@ -1,5 +1,9 @@
 package com.cuidados.paliativos.controlador;
 
+import com.cuidados.paliativos.dao.FrecuenciaDAO;
+import com.cuidados.paliativos.dao.FrecuenciaDAOImpl;
+import com.cuidados.paliativos.dao.MedicamentoDAO;
+import com.cuidados.paliativos.dao.MedicamentoDAOImpl;
 import com.cuidados.paliativos.modelo.Medicamento;
 import com.cuidados.paliativos.modelo.Frecuencia;
 import com.cuidados.paliativos.modelo.Usuario;
@@ -48,24 +52,16 @@ public class ControladorMedicamento {
     @FXML
     private Button btnEliminar;
 
-    @FXML
-    private Button btnConsultar;
-
     private final ObservableList<Medicamento> listaMedicamentos = FXCollections.observableArrayList();
     private final ObservableList<Frecuencia> listaFrecuencias = FXCollections.observableArrayList();
+
+    private final MedicamentoDAO medicamentoDAO = new MedicamentoDAOImpl();
+
+    private final FrecuenciaDAO frecuenciaDAO = new FrecuenciaDAOImpl();
 
     @FXML
     private void initialize() {
         configurarPermisos();
-
-        // Frecuencias de ejemplo (podrían venir de BD)
-        listaFrecuencias.addAll(
-                new Frecuencia(1L, "Diaria"),
-                new Frecuencia(2L, "Semanal"),
-                new Frecuencia(3L, "Mensual")
-        );
-
-        cbFrecuencia.setItems(listaFrecuencias);
 
         // Mostrar descripción en el ComboBox
         cbFrecuencia.setCellFactory(param -> new ListCell<>() {
@@ -91,7 +87,18 @@ public class ControladorMedicamento {
                 c.getValue().getFrecuencia() != null ? c.getValue().getFrecuencia().getDescripcion() : ""
         ));
 
-        tablaMedicamentos.setItems(listaMedicamentos);
+        tablaMedicamentos.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((observable, anterior, seleccionado) -> {
+                    if (seleccionado != null) {
+                        txtNombreMedicamento.setText(seleccionado.getNombre());
+                        txtDosis.setText(seleccionado.getDosis());
+                        cbFrecuencia.setValue(seleccionado.getFrecuencia());
+                    }
+                });
+
+        cargarMedicamentos();
+        cargarFrecuencias();
     }
 
     @FXML
@@ -119,7 +126,8 @@ public class ControladorMedicamento {
         );
         nuevo.setId((long) (listaMedicamentos.size() + 1));
 
-        listaMedicamentos.add(nuevo);
+        medicamentoDAO.guardar(nuevo);
+        cargarMedicamentos();
         limpiarCampos();
     }
 
@@ -134,7 +142,8 @@ public class ControladorMedicamento {
             seleccionado.setNombre(txtNombreMedicamento.getText());
             seleccionado.setDosis(txtDosis.getText());
             seleccionado.setFrecuencia(cbFrecuencia.getValue());
-            tablaMedicamentos.refresh();
+            medicamentoDAO.modificar(seleccionado);
+            cargarMedicamentos();
             limpiarCampos();
         } else {
             mostrarAlerta("Seleccione un medicamento para modificar.");
@@ -149,28 +158,31 @@ public class ControladorMedicamento {
 
         Medicamento seleccionado = tablaMedicamentos.getSelectionModel().getSelectedItem();
         if (seleccionado != null) {
-            listaMedicamentos.remove(seleccionado);
+            medicamentoDAO.eliminar(seleccionado.getId());
+            cargarMedicamentos();
+            limpiarCampos();
         } else {
             mostrarAlerta("Seleccione un medicamento para eliminar.");
         }
     }
 
-    @FXML
-    private void consultarMedicamento() {
-        Medicamento seleccionado = tablaMedicamentos.getSelectionModel().getSelectedItem();
-        if (seleccionado != null) {
-            txtNombreMedicamento.setText(seleccionado.getNombre());
-            txtDosis.setText(seleccionado.getDosis());
-            cbFrecuencia.setValue(seleccionado.getFrecuencia());
-        } else {
-            mostrarAlerta("Seleccione un medicamento para consultar.");
-        }
+    private void cargarMedicamentos() {
+        listaMedicamentos.clear();
+        listaMedicamentos.addAll(medicamentoDAO.listar());
+        tablaMedicamentos.setItems(listaMedicamentos);
+    }
+
+    private void cargarFrecuencias() {
+        listaFrecuencias.clear();
+        listaFrecuencias.addAll(frecuenciaDAO.listar());
+        cbFrecuencia.setItems(listaFrecuencias);
     }
 
     private void limpiarCampos() {
         txtNombreMedicamento.clear();
         txtDosis.clear();
         cbFrecuencia.setValue(null);
+        tablaMedicamentos.getSelectionModel().clearSelection();
     }
 
     private void mostrarAlerta(String mensaje) {
@@ -195,8 +207,6 @@ public class ControladorMedicamento {
             btnGuardar.setDisable(true);
             btnModificar.setDisable(true);
             btnEliminar.setDisable(true);
-
-            btnConsultar.setDisable(true);
         }
     }
 
