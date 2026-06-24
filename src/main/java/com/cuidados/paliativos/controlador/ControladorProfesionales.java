@@ -1,5 +1,6 @@
 package com.cuidados.paliativos.controlador;
 
+import com.cuidados.paliativos.dao.*;
 import com.cuidados.paliativos.modelo.Especialidad;
 import com.cuidados.paliativos.modelo.Profesional;
 import com.cuidados.paliativos.modelo.Usuario;
@@ -61,9 +62,6 @@ public class ControladorProfesionales {
     @FXML
     private Button btnEliminar;
 
-    @FXML
-    private Button btnConsultar;
-
     private final ObservableList<Profesional> listaProfesionales =
             FXCollections.observableArrayList();
 
@@ -73,37 +71,17 @@ public class ControladorProfesionales {
     private final ObservableList<Usuario> listaUsuarios =
             FXCollections.observableArrayList();
 
+    private final ProfesionalDAO profesionalDAO = new ProfesionalDAOImpl();
+
+    private final UsuarioDAO usuarioDAO = new UsuarioDAOImpl();
+
+    private final EspecialidadDAO especialidadDAO = new EspecialidadDAOImpl();
+
     @FXML
     private void initialize() {
         configurarPermisos();
 
-        // DATOS DE EJEMPLO
-
-        listaEspecialidades.addAll(
-                new Especialidad(1L, "Cardiología", "Estudios del corazon."),
-                new Especialidad(2L, "Oncología", "Oncologia"),
-                new Especialidad(3L, "Clínica Médica", "Medicos clinicos")
-        );
-
-        Usuario u1 = new Usuario();
-        u1.setId(1L);
-        u1.setEmail("admin@gmail.com");
-
-        Usuario u2 = new Usuario();
-        u2.setId(2L);
-        u2.setEmail("doctor@gmail.com");
-
-        Usuario u3 = new Usuario();
-        u3.setId(3L);
-        u3.setEmail("medico@gmail.com");
-
-        listaUsuarios.addAll(u1, u2, u3);
-
-        cbEspecialidad.setItems(listaEspecialidades);
-        cbUsuario.setItems(listaUsuarios);
-
         // MOSTRAR NOMBRE EN COMBO ESPECIALIDAD
-
         cbEspecialidad.setCellFactory(param -> new ListCell<>() {
             @Override
             protected void updateItem(Especialidad item, boolean empty) {
@@ -125,7 +103,6 @@ public class ControladorProfesionales {
         });
 
         // MOSTRAR USERNAME EN COMBO USUARIO
-
         cbUsuario.setCellFactory(param -> new ListCell<>() {
             @Override
             protected void updateItem(Usuario item, boolean empty) {
@@ -147,7 +124,6 @@ public class ControladorProfesionales {
         });
 
         // COLUMNAS TABLA
-
         colId.setCellValueFactory(c ->
                 new javafx.beans.property.SimpleLongProperty(
                         c.getValue().getId()
@@ -182,7 +158,21 @@ public class ControladorProfesionales {
                                 : ""
                 ));
 
-        tablaProfesionales.setItems(listaProfesionales);
+        tablaProfesionales.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((observable, anterior, seleccionado) -> {
+                    if (seleccionado != null) {
+                        txtNombre.setText(seleccionado.getNombre());
+                        txtApellido.setText(seleccionado.getApellido());
+                        txtTelefono.setText(seleccionado.getTelefono());
+                        cbEspecialidad.setValue(seleccionado.getEspecialidad());
+                        cbUsuario.setValue(seleccionado.getUsuario());
+                    }
+                });
+
+        cargarProfesionales();
+        cargarUsuarios();
+        cargarEspecialidades();
     }
 
     @FXML
@@ -220,8 +210,9 @@ public class ControladorProfesionales {
         nuevo.setEspecialidad(cbEspecialidad.getValue());
         nuevo.setUsuario(cbUsuario.getValue());
 
-        listaProfesionales.add(nuevo);
+        profesionalDAO.guardar(nuevo);
 
+        cargarProfesionales();
         limpiarCampos();
     }
 
@@ -243,7 +234,9 @@ public class ControladorProfesionales {
             seleccionado.setEspecialidad(cbEspecialidad.getValue());
             seleccionado.setUsuario(cbUsuario.getValue());
 
-            tablaProfesionales.refresh();
+            profesionalDAO.modificar(seleccionado);
+
+            cargarProfesionales();
 
             limpiarCampos();
 
@@ -263,42 +256,42 @@ public class ControladorProfesionales {
                 tablaProfesionales.getSelectionModel().getSelectedItem();
 
         if (seleccionado != null) {
-
-            listaProfesionales.remove(seleccionado);
+            profesionalDAO.eliminar(seleccionado.getId());
+            cargarProfesionales();
+            limpiarCampos();
 
         } else {
             mostrarAlerta("Seleccione un profesional.");
         }
     }
 
-    @FXML
-    private void consultarProfesional() {
+    private void cargarProfesionales() {
+        listaProfesionales.clear();
+        listaProfesionales.addAll(profesionalDAO.listar());
+        tablaProfesionales.setItems(listaProfesionales);
+    }
 
-        Profesional seleccionado =
-                tablaProfesionales.getSelectionModel().getSelectedItem();
+    private void cargarUsuarios() {
+        listaUsuarios.clear();
+        listaUsuarios.addAll(usuarioDAO.listar());
+        cbUsuario.setItems(listaUsuarios);
+    }
 
-        if (seleccionado != null) {
-
-            txtNombre.setText(seleccionado.getNombre());
-            txtApellido.setText(seleccionado.getApellido());
-            txtTelefono.setText(seleccionado.getTelefono());
-
-            cbEspecialidad.setValue(seleccionado.getEspecialidad());
-            cbUsuario.setValue(seleccionado.getUsuario());
-
-        } else {
-            mostrarAlerta("Seleccione un profesional.");
-        }
+    private void cargarEspecialidades() {
+        listaEspecialidades.clear();
+        listaEspecialidades.addAll(especialidadDAO.listar());
+        cbEspecialidad.setItems(listaEspecialidades);
     }
 
     private void limpiarCampos() {
-
         txtNombre.clear();
         txtApellido.clear();
         txtTelefono.clear();
 
         cbEspecialidad.setValue(null);
         cbUsuario.setValue(null);
+
+        tablaProfesionales.getSelectionModel().clearSelection();
     }
 
     private void mostrarAlerta(String mensaje) {
