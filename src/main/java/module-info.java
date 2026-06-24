@@ -10,6 +10,7 @@ module com.cuidados.paliativos.ong.cuidadospalitativosong {
     requires org.kordamp.bootstrapfx.core;
     requires eu.hansolo.tilesfx;
     requires jbcrypt;
+    requires java.sql;
 
     opens com.cuidados.paliativos to javafx.fxml;
     opens com.cuidados.paliativos.controlador to javafx.fxml;
