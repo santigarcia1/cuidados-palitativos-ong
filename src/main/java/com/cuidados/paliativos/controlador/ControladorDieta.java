@@ -1,5 +1,9 @@
 package com.cuidados.paliativos.controlador;
 
+import com.cuidados.paliativos.dao.DietaDAO;
+import com.cuidados.paliativos.dao.DietaDAOImpl;
+import com.cuidados.paliativos.dao.TipoDietaDAO;
+import com.cuidados.paliativos.dao.TipoDietaDAOImpl;
 import com.cuidados.paliativos.modelo.Dieta;
 import com.cuidados.paliativos.modelo.TipoDieta;
 import com.cuidados.paliativos.modelo.Usuario;
@@ -53,26 +57,19 @@ public class ControladorDieta {
     private Button btnEliminar;
 
     @FXML
-    private Button btnConsultar;
-
-    @FXML
     private Button btnDetalles;
 
     private final ObservableList<Dieta> listaDietas = FXCollections.observableArrayList();
+
     private final ObservableList<TipoDieta> listaTiposDieta = FXCollections.observableArrayList();
+
+    private final DietaDAO dietaDAO = new DietaDAOImpl();
+
+    private final TipoDietaDAO tipoDietaDAO = new TipoDietaDAOImpl();
 
     @FXML
     private void initialize() {
         configurarPermisos();
-
-        listaTiposDieta.addAll(
-                new TipoDieta() {{ setId(1L); setNombre("Blanda"); setDescripcion("Comidas suaves"); }},
-                new TipoDieta() {{ setId(2L); setNombre("Hipocalórica"); setDescripcion("Baja en calorías"); }},
-                new TipoDieta() {{ setId(3L); setNombre("Vegetariana"); setDescripcion("Sin carne"); }},
-                new TipoDieta() {{ setId(4L); setNombre("Sin sal"); setDescripcion("Baja en sodio"); }}
-        );
-
-        cbTipoDieta.setItems(listaTiposDieta);
 
         cbTipoDieta.setCellFactory(param -> new ListCell<>() {
             @Override
@@ -96,7 +93,18 @@ public class ControladorDieta {
                 c.getValue().getTipoDieta() != null ? c.getValue().getTipoDieta().getNombre() : ""
         ));
 
-        tablaDietas.setItems(listaDietas);
+        tablaDietas.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((observable, anterior, seleccionado) -> {
+                    if (seleccionado != null) {
+                        txtNombreDieta.setText(seleccionado.getNombre());
+                        txtDescripcion.setText(seleccionado.getDescripcion());
+                        cbTipoDieta.setValue(seleccionado.getTipoDieta());
+                    }
+                });
+
+        cargarDietas();
+        cargarTiposDieta();
     }
 
     @FXML
@@ -114,13 +122,13 @@ public class ControladorDieta {
             return;
         }
 
-        Dieta nueva = new Dieta(
-                (long) (listaDietas.size() + 1),
-                txtNombreDieta.getText(),
-                txtDescripcion.getText(),
-                cbTipoDieta.getValue()
-        );
-        listaDietas.add(nueva);
+        Dieta nuevaDieta = new Dieta();
+        nuevaDieta.setNombre(txtNombreDieta.getText());
+        nuevaDieta.setDescripcion(txtDescripcion.getText());
+        nuevaDieta.setTipoDieta(cbTipoDieta.getValue());
+
+        dietaDAO.guardar(nuevaDieta);
+        cargarDietas();
         limpiarCampos();
     }
 
@@ -135,7 +143,8 @@ public class ControladorDieta {
             seleccionada.setNombre(txtNombreDieta.getText());
             seleccionada.setDescripcion(txtDescripcion.getText());
             seleccionada.setTipoDieta(cbTipoDieta.getValue());
-            tablaDietas.refresh();
+            dietaDAO.modificar(seleccionada);
+            cargarDietas();
             limpiarCampos();
         } else {
             mostrarAlerta("Seleccione una dieta para modificar.");
@@ -150,21 +159,11 @@ public class ControladorDieta {
 
         Dieta seleccionada = tablaDietas.getSelectionModel().getSelectedItem();
         if (seleccionada != null) {
-            listaDietas.remove(seleccionada);
+            dietaDAO.eliminar(seleccionada.getId());
+            cargarDietas();
+            limpiarCampos();
         } else {
             mostrarAlerta("Seleccione una dieta para eliminar.");
-        }
-    }
-
-    @FXML
-    private void consultarDieta() {
-        Dieta seleccionada = tablaDietas.getSelectionModel().getSelectedItem();
-        if (seleccionada != null) {
-            txtNombreDieta.setText(seleccionada.getNombre());
-            txtDescripcion.setText(seleccionada.getDescripcion());
-            cbTipoDieta.setValue(seleccionada.getTipoDieta());
-        } else {
-            mostrarAlerta("Seleccione una dieta para consultar.");
         }
     }
 
@@ -181,7 +180,7 @@ public class ControladorDieta {
         }
 
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/cuidados/paliativos/vista/DetalleDieta.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/cuidados/paliativos/vista/detalle-dieta.fxml"));
             Stage stage = new Stage();
             stage.setTitle("Detalles de dieta: " + seleccionada.getNombre());
             stage.setScene(new Scene(loader.load()));
@@ -195,10 +194,23 @@ public class ControladorDieta {
         }
     }
 
+    private void cargarDietas() {
+        listaDietas.clear();
+        listaDietas.addAll(dietaDAO.listar());
+        tablaDietas.setItems(listaDietas);
+    }
+
+    private void cargarTiposDieta() {
+        listaTiposDieta.clear();
+        listaTiposDieta.addAll(tipoDietaDAO.listar());
+        cbTipoDieta.setItems(listaTiposDieta);
+    }
+
     private void limpiarCampos() {
         txtNombreDieta.clear();
         txtDescripcion.clear();
         cbTipoDieta.setValue(null);
+        tablaDietas.getSelectionModel().clearSelection();
     }
 
     private void mostrarAlerta(String msg) {
@@ -223,7 +235,6 @@ public class ControladorDieta {
             btnGuardar.setDisable(true);
             btnModificar.setDisable(true);
             btnEliminar.setDisable(true);
-            btnConsultar.setDisable(true);
             btnDetalles.setDisable(true);
         }
     }
