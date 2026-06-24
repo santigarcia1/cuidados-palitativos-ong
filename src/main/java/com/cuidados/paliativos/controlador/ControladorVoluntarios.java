@@ -1,5 +1,6 @@
 package com.cuidados.paliativos.controlador;
 
+import com.cuidados.paliativos.dao.*;
 import com.cuidados.paliativos.modelo.Area;
 import com.cuidados.paliativos.modelo.Usuario;
 import com.cuidados.paliativos.modelo.Voluntario;
@@ -63,9 +64,6 @@ public class ControladorVoluntarios {
     @FXML
     private Button btnEliminar;
 
-    @FXML
-    private Button btnConsultar;
-
     private final ObservableList<Voluntario> listaVoluntarios =
             FXCollections.observableArrayList();
 
@@ -75,47 +73,17 @@ public class ControladorVoluntarios {
     private final ObservableList<Usuario> listaUsuarios =
             FXCollections.observableArrayList();
 
+    private final VoluntarioDAO voluntarioDAO = new VoluntarioDAOImpl();
+
+    private final AreaDAO areaDAO = new AreaDAOImpl();
+
+    private final UsuarioDAO usuarioDAO = new UsuarioDAOImpl();
+
     @FXML
     private void initialize() {
         configurarPermisos();
 
-        // AREAS
-
-        Area a1 = new Area();
-        a1.setId(1L);
-        a1.setNombre("Acompañamiento");
-
-        Area a2 = new Area();
-        a2.setId(2L);
-        a2.setNombre("Administración");
-
-        Area a3 = new Area();
-        a3.setId(3L);
-        a3.setNombre("Eventos");
-
-        listaAreas.addAll(a1, a2, a3);
-
-        // USUARIOS
-
-        Usuario u1 = new Usuario();
-        u1.setId(1L);
-        u1.setEmail("voluntario1@gmail.com");
-
-        Usuario u2 = new Usuario();
-        u2.setId(2L);
-        u2.setEmail("voluntario2@gmail.com");
-
-        Usuario u3 = new Usuario();
-        u3.setId(3L);
-        u3.setEmail("voluntario3@gmail.com");
-
-        listaUsuarios.addAll(u1, u2, u3);
-
-        cbArea.setItems(listaAreas);
-        cbUsuario.setItems(listaUsuarios);
-
         // COMBO AREA
-
         cbArea.setCellFactory(param -> new ListCell<>() {
             @Override
             protected void updateItem(Area item, boolean empty) {
@@ -139,7 +107,6 @@ public class ControladorVoluntarios {
         });
 
         // COMBO USUARIO
-
         cbUsuario.setCellFactory(param -> new ListCell<>() {
             @Override
             protected void updateItem(Usuario item, boolean empty) {
@@ -163,7 +130,6 @@ public class ControladorVoluntarios {
         });
 
         // TABLA
-
         colId.setCellValueFactory(c ->
                 new SimpleLongProperty(
                         c.getValue().getId()
@@ -198,7 +164,21 @@ public class ControladorVoluntarios {
                                 : ""
                 ));
 
-        tablaVoluntarios.setItems(listaVoluntarios);
+        tablaVoluntarios.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((observable, anterior, seleccionado) -> {
+                    if (seleccionado != null) {
+                        txtNombre.setText(seleccionado.getNombre());
+                        txtApellido.setText(seleccionado.getApellido());
+                        txtTelefono.setText(seleccionado.getTelefono());
+                        cbArea.setValue(seleccionado.getArea());
+                        cbUsuario.setValue(seleccionado.getUsuario());
+                    }
+                });
+
+        cargarVoluntarios();
+        cargarAreas();
+        cargarUsuarios();
     }
 
     @FXML
@@ -236,8 +216,9 @@ public class ControladorVoluntarios {
         nuevo.setArea(cbArea.getValue());
         nuevo.setUsuario(cbUsuario.getValue());
 
-        listaVoluntarios.add(nuevo);
+        voluntarioDAO.guardar(nuevo);
 
+        cargarVoluntarios();
         limpiarCampos();
     }
 
@@ -259,8 +240,9 @@ public class ControladorVoluntarios {
             seleccionado.setArea(cbArea.getValue());
             seleccionado.setUsuario(cbUsuario.getValue());
 
-            tablaVoluntarios.refresh();
+            voluntarioDAO.modificar(seleccionado);
 
+            cargarVoluntarios();
             limpiarCampos();
 
         } else {
@@ -279,46 +261,44 @@ public class ControladorVoluntarios {
                 tablaVoluntarios.getSelectionModel().getSelectedItem();
 
         if (seleccionado != null) {
-
-            listaVoluntarios.remove(seleccionado);
-
+            voluntarioDAO.eliminar(seleccionado.getId());
+            cargarVoluntarios();
+            limpiarCampos();
         } else {
             mostrarAlerta("Seleccione un voluntario.");
         }
     }
 
-    @FXML
-    private void consultarVoluntario() {
+    private void cargarVoluntarios() {
+        listaVoluntarios.clear();
+        listaVoluntarios.addAll(voluntarioDAO.listar());
+        tablaVoluntarios.setItems(listaVoluntarios);
+    }
 
-        Voluntario seleccionado =
-                tablaVoluntarios.getSelectionModel().getSelectedItem();
+    private void cargarAreas() {
+        listaAreas.clear();
+        listaAreas.addAll(areaDAO.listar());
+        cbArea.setItems(listaAreas);
+    }
 
-        if (seleccionado != null) {
-
-            txtNombre.setText(seleccionado.getNombre());
-            txtApellido.setText(seleccionado.getApellido());
-            txtTelefono.setText(seleccionado.getTelefono());
-
-            cbArea.setValue(seleccionado.getArea());
-            cbUsuario.setValue(seleccionado.getUsuario());
-
-        } else {
-            mostrarAlerta("Seleccione un voluntario.");
-        }
+    private void cargarUsuarios() {
+        listaUsuarios.clear();
+        listaUsuarios.addAll(usuarioDAO.listar());
+        cbUsuario.setItems(listaUsuarios);
     }
 
     private void limpiarCampos() {
-
         txtNombre.clear();
         txtApellido.clear();
         txtTelefono.clear();
 
         cbArea.setValue(null);
         cbUsuario.setValue(null);
+
+        tablaVoluntarios.getSelectionModel().clearSelection();
     }
 
     private void mostrarAlerta(String mensaje) {
-
         Alert alerta = new Alert(Alert.AlertType.WARNING);
 
         alerta.setTitle("Atención");
@@ -329,7 +309,6 @@ public class ControladorVoluntarios {
     }
 
     private boolean tienePermisoGestion() {
-
         Usuario usuario = Sesion.getInstancia().getUsuarioLogueado();
 
         return Permisos.esAdministrador(usuario)
