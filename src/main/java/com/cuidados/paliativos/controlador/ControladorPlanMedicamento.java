@@ -1,11 +1,9 @@
 package com.cuidados.paliativos.controlador;
 
-import com.cuidados.paliativos.dao.FrecuenciaDAO;
-import com.cuidados.paliativos.dao.FrecuenciaDAOImpl;
-import com.cuidados.paliativos.dao.MedicamentoDAO;
-import com.cuidados.paliativos.dao.MedicamentoDAOImpl;
+import com.cuidados.paliativos.dao.*;
 import com.cuidados.paliativos.modelo.Medicamento;
 import com.cuidados.paliativos.modelo.Frecuencia;
+import com.cuidados.paliativos.modelo.PlanCuidado;
 import com.cuidados.paliativos.modelo.Usuario;
 import com.cuidados.paliativos.seguridad.Permisos;
 import com.cuidados.paliativos.seguridad.Sesion;
@@ -14,7 +12,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
-public class ControladorMedicamento {
+public class ControladorPlanMedicamento {
 
     @FXML
     private TextField txtNombreMedicamento;
@@ -52,12 +50,16 @@ public class ControladorMedicamento {
     @FXML
     private Button btnEliminar;
 
+    private PlanCuidado planSeleccionado;
+
     private final ObservableList<Medicamento> listaMedicamentos = FXCollections.observableArrayList();
     private final ObservableList<Frecuencia> listaFrecuencias = FXCollections.observableArrayList();
 
     private final MedicamentoDAO medicamentoDAO = new MedicamentoDAOImpl();
 
     private final FrecuenciaDAO frecuenciaDAO = new FrecuenciaDAOImpl();
+
+    private final PlanMedicamentoDAO planMedicamentoDAO = new PlanMedicamentoDAOImpl();
 
     @FXML
     private void initialize() {
@@ -96,7 +98,10 @@ public class ControladorMedicamento {
                         cbFrecuencia.setValue(seleccionado.getFrecuencia());
                     }
                 });
+    }
 
+    public void setPlanCuidado(PlanCuidado plan) {
+        this.planSeleccionado = plan;
         cargarMedicamentos();
         cargarFrecuencias();
     }
@@ -125,7 +130,8 @@ public class ControladorMedicamento {
                 cbFrecuencia.getValue()
         );
 
-        medicamentoDAO.guardar(nuevo);
+        Long idNuevo = medicamentoDAO.guardar(nuevo);
+        planMedicamentoDAO.guardar(this.planSeleccionado.getId(), idNuevo);
         cargarMedicamentos();
         limpiarCampos();
     }
@@ -157,6 +163,7 @@ public class ControladorMedicamento {
 
         Medicamento seleccionado = tablaMedicamentos.getSelectionModel().getSelectedItem();
         if (seleccionado != null) {
+            planMedicamentoDAO.eliminar(this.planSeleccionado.getId(), seleccionado.getId());
             medicamentoDAO.eliminar(seleccionado.getId());
             cargarMedicamentos();
             limpiarCampos();
@@ -167,7 +174,7 @@ public class ControladorMedicamento {
 
     private void cargarMedicamentos() {
         listaMedicamentos.clear();
-        listaMedicamentos.addAll(medicamentoDAO.listar());
+        listaMedicamentos.addAll(medicamentoDAO.buscarPorIdDePlanCuidado(this.planSeleccionado.getId()));
         tablaMedicamentos.setItems(listaMedicamentos);
     }
 
@@ -212,8 +219,8 @@ public class ControladorMedicamento {
     private boolean tienePermisoEdicion() {
         Usuario usuario = Sesion.getInstancia().getUsuarioLogueado();
 
-        if (Permisos.esVoluntario(usuario) ||
-                Permisos.esAdministrativo(usuario)) {
+        if (Permisos.esVoluntario(usuario)
+                || Permisos.esAdministrativo(usuario)) {
 
             mostrarAlerta(
                     "No posee permisos para acceder a esta funcionalidad."

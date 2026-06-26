@@ -1,6 +1,7 @@
 package com.cuidados.paliativos.modelo;
 
 import java.util.Date;
+import java.util.Objects;
 
 public class Paciente {
     private Long id;
@@ -27,4 +28,23 @@ public class Paciente {
     public void setTelefono(String telefono) { this.telefono = telefono; }
     public EstadoUsuario getEstado() { return estado; }
     public void setEstado(EstadoUsuario estado) { this.estado = estado; }
+
+    @Override
+    public boolean equals(Object o) {
+
+        if (this == o)
+            return true;
+
+        if (!(o instanceof Paciente))
+            return false;
+
+        Paciente paciente = (Paciente) o;
+
+        return Objects.equals(id, paciente.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }

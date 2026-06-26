@@ -1,6 +1,7 @@
 package com.cuidados.paliativos.modelo;
 
 import java.util.List;
+import java.util.Objects;
 
 public class Dieta {
     private Long id;
@@ -56,5 +57,24 @@ public class Dieta {
 
     public void setDetalles(List<DetalleDieta> detalles) {
         this.detalles = detalles;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+
+        if (this == o)
+            return true;
+
+        if (!(o instanceof Dieta))
+            return false;
+
+        Dieta dieta = (Dieta) o;
+
+        return Objects.equals(id, dieta.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

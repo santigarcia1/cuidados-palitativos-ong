@@ -11,7 +11,7 @@ import java.util.List;
 public class DietaDAOImpl implements DietaDAO {
 
     @Override
-    public void guardar(Dieta dieta) {
+    public Long guardar(Dieta dieta) {
 
         String sql = """
                 INSERT INTO dietas
@@ -21,7 +21,10 @@ public class DietaDAOImpl implements DietaDAO {
 
         try (
                 Connection conn = ConexionBD.conectar();
-                PreparedStatement ps = conn.prepareStatement(sql)
+                PreparedStatement ps = conn.prepareStatement(
+                        sql,
+                        Statement.RETURN_GENERATED_KEYS
+                )
         ) {
 
             ps.setString(1, dieta.getNombre());
@@ -33,9 +36,16 @@ public class DietaDAOImpl implements DietaDAO {
 
             ps.executeUpdate();
 
+            ResultSet rs = ps.getGeneratedKeys();
+
+            if (rs.next()) {
+                return rs.getLong(1);
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return null;
     }
 
     @Override
@@ -111,6 +121,72 @@ public class DietaDAOImpl implements DietaDAO {
                 PreparedStatement ps = conn.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery()
         ) {
+
+            while (rs.next()) {
+
+                TipoDieta tipo = new TipoDieta();
+
+                tipo.setId(
+                        rs.getLong("id_tipo_dieta")
+                );
+
+                tipo.setNombre(
+                        rs.getString("nombre_tipo")
+                );
+
+                tipo.setDescripcion(
+                        rs.getString("descripcion_tipo")
+                );
+
+                Dieta dieta = new Dieta();
+
+                dieta.setId(
+                        rs.getLong("id")
+                );
+
+                dieta.setNombre(
+                        rs.getString("nombre")
+                );
+
+                dieta.setDescripcion(
+                        rs.getString("descripcion")
+                );
+
+                dieta.setTipoDieta(tipo);
+
+                dietas.add(dieta);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return dietas;
+    }
+
+    @Override
+    public List<Dieta> buscarPorIdDePlanDeCuidado(Long idPlanCuidado) {
+        List<Dieta> dietas = new ArrayList<>();
+
+        String sql = """
+                SELECT d.*,
+                       td.nombre AS nombre_tipo,
+                       td.descripcion AS descripcion_tipo
+                FROM dietas d
+                INNER JOIN tipos_dieta td
+                    ON d.id_tipo_dieta = td.id
+                INNER JOIN plan_dieta pd
+                    ON d.id = pd.id_dieta
+                WHERE pd.id_plan = ?
+                ORDER BY d.id
+                """;
+
+        try (
+                Connection conn = ConexionBD.conectar();
+                PreparedStatement ps = conn.prepareStatement(sql);
+        ) {
+            ps.setLong(1, idPlanCuidado);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 

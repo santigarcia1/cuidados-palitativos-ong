@@ -6,11 +6,13 @@ import java.util.List;
 
 public interface DietaDAO {
 
-    void guardar(Dieta dieta);
+    Long guardar(Dieta dieta);
 
     void modificar(Dieta dieta);
 
     void eliminar(Long id);
 
     List<Dieta> listar();
+
+    List<Dieta> buscarPorIdDePlanDeCuidado(Long idPlanCuidado);
 }
