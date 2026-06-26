@@ -1,9 +1,9 @@
 package com.cuidados.paliativos.controlador;
 
 import com.cuidados.paliativos.MainApp;
-import com.cuidados.paliativos.modelo.Rol;
+import com.cuidados.paliativos.dao.UsuarioDAO;
+import com.cuidados.paliativos.dao.UsuarioDAOImpl;
 import com.cuidados.paliativos.modelo.Usuario;
-import com.cuidados.paliativos.seguridad.DatosPrueba;
 import com.cuidados.paliativos.seguridad.SeguridadUtil;
 import com.cuidados.paliativos.seguridad.Sesion;
 import javafx.fxml.FXML;
@@ -16,13 +16,15 @@ public class ControladorLogin {
     @FXML private PasswordField txtPassword;
     @FXML private Label lblError;
 
+    private final UsuarioDAO usuarioDAO = new UsuarioDAOImpl();
+
     @FXML
     private void onLogin() {
 
         String email = txtEmail.getText();
         String password = txtPassword.getText();
 
-        Usuario usuario = buscarUsuario(email);
+        Usuario usuario = usuarioDAO.buscarPorEmail(email);
 
         if (usuario != null &&
                 SeguridadUtil.verificar(
@@ -40,16 +42,5 @@ public class ControladorLogin {
         } else {
             lblError.setText("Credenciales incorrectas.");
         }
-    }
-
-    private Usuario buscarUsuario(String email) {
-
-        return DatosPrueba.getUsuarios()
-                .stream()
-                .filter(u ->
-                        u.getEmail()
-                                .equalsIgnoreCase(email))
-                .findFirst()
-                .orElse(null);
     }
 }
