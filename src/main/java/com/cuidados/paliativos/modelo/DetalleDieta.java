@@ -1,18 +1,14 @@
 package com.cuidados.paliativos.modelo;
 
 public class DetalleDieta {
-    public enum Horario {
-        DESAYUNO, ALMUERZO, MERIENDA, CENA
-    }
-    
     private Long id;
     private Dieta dieta;
-    private Horario horario;
+    private String horario;
     private String descripcion;
 
     public DetalleDieta() {}
 
-    public DetalleDieta(Long id, Dieta dieta, Horario horario, String descripcion) {
+    public DetalleDieta(Long id, Dieta dieta, String horario, String descripcion) {
         this.id = id;
         this.dieta = dieta;
         this.horario = horario;
@@ -35,11 +31,11 @@ public class DetalleDieta {
         this.dieta = dieta;
     }
 
-    public Horario getHorario() {
+    public String getHorario() {
         return horario;
     }
 
-    public void setHorario(Horario horario) {
+    public void setHorario(String horario) {
         this.horario = horario;
     }
 

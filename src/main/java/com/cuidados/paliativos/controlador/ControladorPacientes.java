@@ -242,7 +242,6 @@ public class ControladorPacientes {
         Paciente seleccionado =
                 tablaPacientes.getSelectionModel().getSelectedItem();
 
-        System.out.println(seleccionado.getNombre());
         if (seleccionado.getEstado().getId().equals(2L)) {
             mostrarAlerta("El paciente ya no se encuentra en la ONG.");
             return;
