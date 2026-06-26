@@ -1,9 +1,11 @@
 package com.cuidados.paliativos.controlador;
 
-import com.cuidados.paliativos.modelo.Usuario;
+import com.cuidados.paliativos.dao.*;
+import com.cuidados.paliativos.modelo.*;
 import com.cuidados.paliativos.seguridad.Permisos;
 import com.cuidados.paliativos.seguridad.Sesion;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -25,18 +27,17 @@ import java.time.LocalDate;
 public class ControladorPlanesCuidado {
 
     // --- Componentes de interfaz ---
-    @FXML private ComboBox<String> cbPacientes;
-    @FXML private ComboBox<String> cbProfesionales;
+    @FXML private ComboBox<Paciente> cbPacientes;
+    @FXML private ComboBox<Profesional> cbProfesionales;
     @FXML private DatePicker dpFechaCreacion;
     @FXML private TextArea txtObservaciones;
-    @FXML private ComboBox<String> cbMedicamentos;
-    @FXML private ComboBox<String> cbDietas;
 
-    @FXML private TableView<PlanCuidadoDTO> tablaPlanes;
-    @FXML private TableColumn<PlanCuidadoDTO, String> colPaciente;
-    @FXML private TableColumn<PlanCuidadoDTO, String> colProfesional;
-    @FXML private TableColumn<PlanCuidadoDTO, String> colFecha;
-    @FXML private TableColumn<PlanCuidadoDTO, String> colObservaciones;
+    @FXML private TableView<PlanCuidado> tablaPlanes;
+    @FXML private TableColumn<PlanCuidado, String> colId;
+    @FXML private TableColumn<PlanCuidado, String> colPaciente;
+    @FXML private TableColumn<PlanCuidado, String> colProfesional;
+    @FXML private TableColumn<PlanCuidado, String> colFecha;
+    @FXML private TableColumn<PlanCuidado, String> colObservaciones;
 
     @FXML
     private Button btnNuevo;
@@ -45,41 +46,141 @@ public class ControladorPlanesCuidado {
     private Button btnGuardar;
 
     @FXML
+    private Button btnModificar;
+
+    @FXML
     private Button btnEliminar;
 
     @FXML
-    private Button btnNuevoMedicamento;
+    private Button btnMedicamentos;
 
     @FXML
-    private Button btnNuevaDieta;
+    private Button btnDietas;
 
     // --- Datos simulados ---
-    private final ObservableList<String> pacientes = FXCollections.observableArrayList("Juan Pérez", "María Gómez");
-    private final ObservableList<String> profesionales = FXCollections.observableArrayList("Dr. López", "Dra. Martínez");
-    private final ObservableList<String> medicamentos = FXCollections.observableArrayList("Paracetamol", "Ibuprofeno");
-    private final ObservableList<String> dietas = FXCollections.observableArrayList("Blanda", "Hipocalórica");
+    private final ObservableList<Paciente> listaPacientes = FXCollections.observableArrayList();
+    private final ObservableList<Profesional> listaProfesionales = FXCollections.observableArrayList();
+    private final ObservableList<Medicamento> listaMedicamentos = FXCollections.observableArrayList();
+    private final ObservableList<Dieta> listaDietas = FXCollections.observableArrayList();
 
-    private final ObservableList<PlanCuidadoDTO> listaPlanes = FXCollections.observableArrayList();
+    private final ObservableList<PlanCuidado> listaPlanes = FXCollections.observableArrayList();
+
+    private final PlanCuidadoDAO planCuidadoDAO = new PlanCuidadoDAOImpl();
+
+    private final PacienteDAO pacienteDAO = new PacienteDAOImpl();
+
+    private final ProfesionalDAO profesionalDAO = new ProfesionalDAOImpl();
+
+    private final MedicamentoDAO medicamentoDAO = new MedicamentoDAOImpl();
+
+    private final DietaDAO dietaDAO = new DietaDAOImpl();
 
     // --- Inicialización ---
     @FXML
     public void initialize() {
         configurarPermisos();
 
-        cbPacientes.setItems(pacientes);
-        cbProfesionales.setItems(profesionales);
-        cbMedicamentos.setItems(medicamentos);
-        cbDietas.setItems(dietas);
-
-        dpFechaCreacion.setValue(LocalDate.now());
-
         // Configurar columnas de tabla
-        colPaciente.setCellValueFactory(cellData -> cellData.getValue().pacienteProperty());
-        colProfesional.setCellValueFactory(cellData -> cellData.getValue().profesionalProperty());
-        colFecha.setCellValueFactory(cellData -> cellData.getValue().fechaProperty());
-        colObservaciones.setCellValueFactory(cellData -> cellData.getValue().observacionesProperty());
 
-        tablaPlanes.setItems(listaPlanes);
+        colId.setCellValueFactory(c ->
+                new SimpleStringProperty(
+                        c.getValue().getId().toString()
+                ));
+
+        colPaciente.setCellValueFactory(c ->
+                new SimpleStringProperty(
+                        c.getValue().getPaciente().getNombre() + " " + c.getValue().getPaciente().getApellido()
+                ));
+
+        colProfesional.setCellValueFactory(c ->
+                new SimpleStringProperty(
+                        c.getValue().getProfesional().getNombre() + " " + c.getValue().getProfesional().getApellido()
+                ));
+
+        colFecha.setCellValueFactory(c ->
+                new SimpleStringProperty(
+                        c.getValue().getFechaCreacion() != null
+                                ? c.getValue().getFechaCreacion().toString()
+                                : ""
+                ));
+
+        colObservaciones.setCellValueFactory(c ->
+                new SimpleStringProperty(
+                        c.getValue().getObservaciones()
+                ));
+
+        cbPacientes.setCellFactory(param -> new ListCell<>() {
+            @Override
+            protected void updateItem(Paciente item, boolean empty) {
+                super.updateItem(item, empty);
+
+                setText(
+                        empty || item == null
+                                ? null
+                                : item.getNombre() + " " + item.getApellido()
+                );
+            }
+        });
+
+        cbProfesionales.setCellFactory(param -> new ListCell<>() {
+            @Override
+            protected void updateItem(Profesional item, boolean empty) {
+                super.updateItem(item, empty);
+
+                setText(
+                        empty || item == null
+                                ? null
+                                : item.getNombre() + " " + item.getApellido()
+                );
+            }
+        });
+
+        cbProfesionales.setButtonCell(new ListCell<>() {
+            @Override
+            protected void updateItem(Profesional item, boolean empty) {
+                super.updateItem(item, empty);
+
+                setText(
+                        empty || item == null
+                                ? null
+                                : item.getNombre() + " " + item.getApellido()
+                );
+            }
+        });
+
+        cbPacientes.setButtonCell(new ListCell<>() {
+            @Override
+            protected void updateItem(Paciente item, boolean empty) {
+                super.updateItem(item, empty);
+
+                setText(
+                        empty || item == null
+                                ? null
+                                : item.getNombre() + " " + item.getApellido()
+                );
+            }
+        });
+
+        tablaPlanes.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((observable, anterior, seleccionado) -> {
+                    if (seleccionado != null) {
+
+                        txtObservaciones.setText(seleccionado.getObservaciones());
+                        cbPacientes.setValue(seleccionado.getPaciente());
+//                        cbDietas.setValue(seleccionado.getDieta());
+//                        cbMedicamentos.setValue(seleccionado.getMedicamento());
+                        cbProfesionales.setValue(seleccionado.getProfesional());
+
+                        if (seleccionado.getFechaCreacion() != null) {
+                            dpFechaCreacion.setValue(
+                                    seleccionado.getFechaCreacion()
+                            );
+                        }
+                    }
+                });
+
+        cargarInfoInicial();
     }
 
     // --- Acciones de botones ---
@@ -92,13 +193,7 @@ public class ControladorPlanesCuidado {
             );
             return;
         }
-
-        cbPacientes.getSelectionModel().clearSelection();
-        cbProfesionales.getSelectionModel().clearSelection();
-        cbMedicamentos.getSelectionModel().clearSelection();
-        cbDietas.getSelectionModel().clearSelection();
-        txtObservaciones.clear();
-        dpFechaCreacion.setValue(LocalDate.now());
+        limpiarCampos();
     }
 
     @FXML
@@ -111,8 +206,8 @@ public class ControladorPlanesCuidado {
             return;
         }
 
-        String paciente = cbPacientes.getValue();
-        String profesional = cbProfesionales.getValue();
+        Paciente paciente = cbPacientes.getValue();
+        Profesional profesional = cbProfesionales.getValue();
         String fecha = dpFechaCreacion.getValue().toString();
         String observaciones = txtObservaciones.getText();
 
@@ -121,16 +216,53 @@ public class ControladorPlanesCuidado {
             return;
         }
 
-        listaPlanes.add(new PlanCuidadoDTO(paciente, profesional, fecha, observaciones));
+        PlanCuidado nuevoPlan = new PlanCuidado();
+        nuevoPlan.setPaciente(paciente);
+        nuevoPlan.setProfesional(profesional);
+        nuevoPlan.setFechaCreacion(LocalDate.parse(fecha));
+        nuevoPlan.setObservaciones(observaciones);
+
+        planCuidadoDAO.guardar(nuevoPlan);
+
+        cargarInfoInicial();
+
         mostrarAlerta("Plan de cuidado guardado exitosamente.", Alert.AlertType.INFORMATION);
-        nuevoPlan();
+        limpiarCampos();
+    }
+
+    @FXML
+    private void modificarPlan() {
+        if (!puedeGestionarPlanes()) {
+            mostrarAlerta("No posee permisos para realizar esta acción.", Alert.AlertType.WARNING);
+            return;
+        }
+
+        PlanCuidado seleccionado =
+                tablaPlanes.getSelectionModel().getSelectedItem();
+
+        if (seleccionado != null) {
+            seleccionado.setObservaciones(txtObservaciones.getText());
+            seleccionado.setPaciente(cbPacientes.getValue());
+            seleccionado.setProfesional(cbProfesionales.getValue());
+            seleccionado.setFechaCreacion(dpFechaCreacion.getValue());
+
+            planCuidadoDAO.modificar(seleccionado);
+            cargarInfoInicial();
+
+            limpiarCampos();
+
+        } else {
+            mostrarAlerta("Seleccione un paciente.", Alert.AlertType.WARNING);
+        }
     }
 
     @FXML
     private void eliminarPlan() {
-        PlanCuidadoDTO seleccionado = tablaPlanes.getSelectionModel().getSelectedItem();
+        PlanCuidado seleccionado = tablaPlanes.getSelectionModel().getSelectedItem();
         if (seleccionado != null) {
-            listaPlanes.remove(seleccionado);
+            planCuidadoDAO.eliminar(seleccionado.getId());
+            limpiarCampos();
+            cargarInfoInicial();
             mostrarAlerta("Plan eliminado correctamente.", Alert.AlertType.INFORMATION);
         } else {
             mostrarAlerta("Debe seleccionar un plan para eliminar.", Alert.AlertType.WARNING);
@@ -138,21 +270,28 @@ public class ControladorPlanesCuidado {
     }
 
     @FXML
-    private void crearNuevoMedicamento() {
-        try {
-            if (!puedeGestionarPlanes()) {
-                mostrarAlerta(
-                        "No posee permisos para realizar esta acción.",
-                        Alert.AlertType.WARNING
-                );
-                return;
-            }
+    private void abrirPantallaMedicamentos() {
+        if (!puedeGestionarDietasOMedicamentos()) {
+            return;
+        }
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/cuidados/paliativos/vista/medicamentos.fxml"));
-            Parent root = loader.load();
+        PlanCuidado seleccionado = tablaPlanes.getSelectionModel().getSelectedItem();
+        if (seleccionado == null) {
+            mostrarAlerta("Seleccione un plan de cuidados para gestionar sus medicamentos.", Alert.AlertType.WARNING);
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/cuidados/paliativos/vista/plan-medicamentos.fxml"));
             Stage stage = new Stage();
-            stage.setTitle("Gestión de Medicamentos");
-            stage.setScene(new Scene(root));
+            stage.setTitle("Medicamentos del plan de cuidado - Paciente: "
+                    + seleccionado.getPaciente().getNombre() + " " + seleccionado.getPaciente().getApellido());
+            stage.setScene(new Scene(loader.load()));
+
+            ControladorPlanMedicamento controlador = loader.getController();
+
+            controlador.setPlanCuidado(seleccionado);
+
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
@@ -160,27 +299,68 @@ public class ControladorPlanesCuidado {
     }
 
     @FXML
-    private void crearNuevaDieta() {
-        try {
-            if (!puedeGestionarPlanes()) {
-                mostrarAlerta(
-                        "No posee permisos para realizar esta acción.",
-                        Alert.AlertType.WARNING
-                );
-                return;
-            }
+    private void abrirPantallaDietas() {
+        if (!puedeGestionarDietasOMedicamentos()) {
+            return;
+        }
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/cuidados/paliativos/vista/dietas.fxml"));
-            Parent root = loader.load();
+        PlanCuidado seleccionado = tablaPlanes.getSelectionModel().getSelectedItem();
+        if (seleccionado == null) {
+            mostrarAlerta("Seleccione un plan de cuidados para gestionar sus dietas.", Alert.AlertType.WARNING);
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/cuidados/paliativos/vista/plan-dietas.fxml"));
             Stage stage = new Stage();
-            stage.setTitle("Gestión de Dietas");
-            stage.setScene(new Scene(root));
+            stage.setTitle("Medicamentos del plan de cuidado - Paciente: "
+                    + seleccionado.getPaciente().getNombre() + " " + seleccionado.getPaciente().getApellido());
+            stage.setScene(new Scene(loader.load()));
+
+            ControladorPlanDieta controlador = loader.getController();
+
+            controlador.setPlanCuidado(seleccionado);
+
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    private void cargarPlanes() {
+        listaPlanes.clear();
+        listaPlanes.addAll(planCuidadoDAO.listar());
+        tablaPlanes.setItems(listaPlanes);
+    }
+
+    private void cargarProfesionales() {
+        listaProfesionales.clear();
+        listaProfesionales.addAll(profesionalDAO.listar());
+        cbProfesionales.setItems(listaProfesionales);
+    }
+
+    private void cargarPacientes() {
+        listaPacientes.clear();
+        listaPacientes.addAll(pacienteDAO.listar());
+        cbPacientes.setItems(listaPacientes);
+    }
+
+    private void cargarInfoInicial() {
+        cargarPlanes();
+        cargarProfesionales();
+        cargarPacientes();
+    }
+
+    private void limpiarCampos() {
+        txtObservaciones.clear();
+
+        dpFechaCreacion.setValue(LocalDate.now());
+
+        cbPacientes.setValue(null);
+        cbProfesionales.setValue(null);
+
+        tablaPlanes.getSelectionModel().clearSelection();
+    }
 
     // --- Utilidad ---
     private void mostrarAlerta(String mensaje, Alert.AlertType tipo) {
@@ -190,32 +370,20 @@ public class ControladorPlanesCuidado {
         alert.showAndWait();
     }
 
-    // --- DTO temporal para la tabla ---
-    public static class PlanCuidadoDTO {
-        private final javafx.beans.property.SimpleStringProperty paciente;
-        private final javafx.beans.property.SimpleStringProperty profesional;
-        private final javafx.beans.property.SimpleStringProperty fecha;
-        private final javafx.beans.property.SimpleStringProperty observaciones;
-
-        public PlanCuidadoDTO(String paciente, String profesional, String fecha, String observaciones) {
-            this.paciente = new javafx.beans.property.SimpleStringProperty(paciente);
-            this.profesional = new javafx.beans.property.SimpleStringProperty(profesional);
-            this.fecha = new javafx.beans.property.SimpleStringProperty(fecha);
-            this.observaciones = new javafx.beans.property.SimpleStringProperty(observaciones);
-        }
-
-        public javafx.beans.property.StringProperty pacienteProperty() { return paciente; }
-        public javafx.beans.property.StringProperty profesionalProperty() { return profesional; }
-        public javafx.beans.property.StringProperty fechaProperty() { return fecha; }
-        public javafx.beans.property.StringProperty observacionesProperty() { return observaciones; }
-    }
-
     private boolean puedeGestionarPlanes() {
 
         Usuario usuario = Sesion.getInstancia().getUsuarioLogueado();
 
         return Permisos.esAdministrador(usuario)
                 || Permisos.esProfesional(usuario);
+    }
+
+    private boolean puedeGestionarDietasOMedicamentos() {
+        Usuario usuario = Sesion.getInstancia().getUsuarioLogueado();
+
+        return Permisos.esVoluntario(usuario)
+                || Permisos.esProfesional(usuario)
+                || Permisos.esAdministrador(usuario);
     }
 
     private void configurarPermisos() {
@@ -232,13 +400,11 @@ public class ControladorPlanesCuidado {
             btnGuardar.setDisable(true);
             btnEliminar.setDisable(true);
 
-            btnNuevoMedicamento.setDisable(true);
-            btnNuevaDieta.setDisable(true);
+            btnMedicamentos.setDisable(true);
+            btnDietas.setDisable(true);
 
             cbPacientes.setDisable(true);
             cbProfesionales.setDisable(true);
-            cbMedicamentos.setDisable(true);
-            cbDietas.setDisable(true);
 
             dpFechaCreacion.setDisable(true);
 

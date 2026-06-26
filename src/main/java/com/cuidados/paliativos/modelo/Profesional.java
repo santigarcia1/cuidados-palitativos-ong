@@ -1,5 +1,7 @@
 package com.cuidados.paliativos.modelo;
 
+import java.util.Objects;
+
 public class Profesional {
     private Long id;
     private String nombre;
@@ -67,5 +69,24 @@ public class Profesional {
 
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+
+        if (this == o)
+            return true;
+
+        if (!(o instanceof Profesional))
+            return false;
+
+        Profesional profesional = (Profesional) o;
+
+        return Objects.equals(id, profesional.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

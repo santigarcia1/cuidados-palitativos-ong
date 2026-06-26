@@ -1,10 +1,8 @@
 package com.cuidados.paliativos.controlador;
 
-import com.cuidados.paliativos.dao.DietaDAO;
-import com.cuidados.paliativos.dao.DietaDAOImpl;
-import com.cuidados.paliativos.dao.TipoDietaDAO;
-import com.cuidados.paliativos.dao.TipoDietaDAOImpl;
+import com.cuidados.paliativos.dao.*;
 import com.cuidados.paliativos.modelo.Dieta;
+import com.cuidados.paliativos.modelo.PlanCuidado;
 import com.cuidados.paliativos.modelo.TipoDieta;
 import com.cuidados.paliativos.modelo.Usuario;
 import com.cuidados.paliativos.seguridad.Permisos;
@@ -18,7 +16,7 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 import java.io.IOException;
 
-public class ControladorDieta {
+public class ControladorPlanDieta {
 
     @FXML
     private TextField txtNombreDieta;
@@ -59,6 +57,8 @@ public class ControladorDieta {
     @FXML
     private Button btnDetalles;
 
+    private PlanCuidado planSeleccionado;
+
     private final ObservableList<Dieta> listaDietas = FXCollections.observableArrayList();
 
     private final ObservableList<TipoDieta> listaTiposDieta = FXCollections.observableArrayList();
@@ -66,6 +66,8 @@ public class ControladorDieta {
     private final DietaDAO dietaDAO = new DietaDAOImpl();
 
     private final TipoDietaDAO tipoDietaDAO = new TipoDietaDAOImpl();
+
+    private final PlanDietaDAO planDietaDAO = new PlanDietaImpl();
 
     @FXML
     private void initialize() {
@@ -102,7 +104,10 @@ public class ControladorDieta {
                         cbTipoDieta.setValue(seleccionado.getTipoDieta());
                     }
                 });
+    }
 
+    public void setPlanCuidado(PlanCuidado plan) {
+        this.planSeleccionado = plan;
         cargarDietas();
         cargarTiposDieta();
     }
@@ -131,7 +136,8 @@ public class ControladorDieta {
         nuevaDieta.setDescripcion(txtDescripcion.getText());
         nuevaDieta.setTipoDieta(cbTipoDieta.getValue());
 
-        dietaDAO.guardar(nuevaDieta);
+        Long idNueva = dietaDAO.guardar(nuevaDieta);
+        planDietaDAO.guardar(this.planSeleccionado.getId(), idNueva);
         cargarDietas();
         limpiarCampos();
     }
@@ -163,6 +169,7 @@ public class ControladorDieta {
 
         Dieta seleccionada = tablaDietas.getSelectionModel().getSelectedItem();
         if (seleccionada != null) {
+            planDietaDAO.eliminar(this.planSeleccionado.getId(), seleccionada.getId());
             dietaDAO.eliminar(seleccionada.getId());
             cargarDietas();
             limpiarCampos();
@@ -201,7 +208,7 @@ public class ControladorDieta {
 
     private void cargarDietas() {
         listaDietas.clear();
-        listaDietas.addAll(dietaDAO.listar());
+        listaDietas.addAll(dietaDAO.buscarPorIdDePlanDeCuidado(this.planSeleccionado.getId()));
         tablaDietas.setItems(listaDietas);
     }
 
