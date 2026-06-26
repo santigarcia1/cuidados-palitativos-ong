@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.cuidados.paliativos.controlador.ControladorDetalleDieta"
+            style="-fx-background-color: #2C3E50;">
+
+    <!-- ENCABEZADO -->
+    <top>
+        <HBox alignment="CENTER_LEFT"
+              spacing="10"
+              style="-fx-background-color: #34495E; -fx-padding: 10;">
+
+            <Label text="Detalle de Dieta"
+                   style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;" />
+
+        </HBox>
+    </top>
+
+    <!-- CONTENIDO CENTRAL -->
+    <center>
+
+        <VBox alignment="TOP_CENTER" spacing="15">
+
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+
+            <!-- FORMULARIO -->
+            <GridPane hgap="15" vgap="10">
+
+                <columnConstraints>
+                    <ColumnConstraints halignment="RIGHT" minWidth="150"/>
+                    <ColumnConstraints halignment="LEFT" minWidth="250"/>
+                </columnConstraints>
+
+                <!-- Horario -->
+                <Label text="Horario:"
+                       style="-fx-text-fill: white;" />
+
+                <ComboBox fx:id="cbHorario"
+                          prefWidth="250"
+                          promptText="Seleccione un horario"
+                          GridPane.columnIndex="1" />
+
+                <!-- Descripción -->
+                <Label text="Descripción:"
+                       style="-fx-text-fill: white;"
+                       GridPane.rowIndex="1" />
+
+                <TextArea fx:id="txtDescripcion"
+                          prefWidth="250"
+                          prefHeight="80"
+                          GridPane.columnIndex="1"
+                          GridPane.rowIndex="1" />
+
+            </GridPane>
+
+            <!-- BOTONES -->
+            <HBox alignment="CENTER" spacing="10">
+
+                <Button fx:id="btnNuevo"
+                        text="Limpiar campos"
+                        onAction="#nuevoDetalle" />
+
+                <Button fx:id="btnGuardar"
+                        text="Guardar"
+                        onAction="#guardarDetalle" />
+
+                <Button fx:id="btnModificar"
+                        text="Modificar"
+                        onAction="#modificarDetalle" />
+
+                <Button fx:id="btnEliminar"
+                        text="Eliminar"
+                        onAction="#eliminarDetalle" />
+
+            </HBox>
+
+            <!-- TABLA -->
+            <TableView fx:id="tablaDetalles"
+                       prefWidth="700"
+                       style="-fx-background-color: #ECF0F1; -fx-border-radius: 5;">
+
+                <columns>
+
+                    <TableColumn fx:id="colId"
+                                 text="ID"
+                                 prefWidth="60" />
+
+                    <TableColumn fx:id="colHorario"
+                                 text="Horario"
+                                 prefWidth="200" />
+
+                    <TableColumn fx:id="colDescripcion"
+                                 text="Descripción"
+                                 prefWidth="400" />
+
+                </columns>
+
+            </TableView>
+
+        </VBox>
+
+    </center>
+
+</BorderPane>

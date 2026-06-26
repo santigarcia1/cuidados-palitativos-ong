@@ -1,22 +1,32 @@
 package com.cuidados.paliativos.controlador;
 
+import com.cuidados.paliativos.dao.DetalleDietaDAO;
+import com.cuidados.paliativos.dao.DetalleDietaDAOImpl;
 import com.cuidados.paliativos.modelo.Dieta;
 import com.cuidados.paliativos.modelo.DetalleDieta;
+import javafx.beans.property.SimpleLongProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
+import java.util.List;
+
 public class ControladorDetalleDieta {
 
     @FXML
-    private ComboBox<DetalleDieta.Horario> cbHorario;
+    private ComboBox<String> cbHorario;
 
     @FXML
     private TextArea txtDescripcion;
 
     @FXML
     private TableView<DetalleDieta> tablaDetalles;
+
+    @FXML
+    private TableColumn<DetalleDieta, Long> colId;
 
     @FXML
     private TableColumn<DetalleDieta, String> colHorario;
@@ -26,60 +36,114 @@ public class ControladorDetalleDieta {
 
     private final ObservableList<DetalleDieta> listaDetalles = FXCollections.observableArrayList();
 
+    private final ObservableList<String> horarios = FXCollections.observableArrayList();
+
     private Dieta dietaSeleccionada;
+
+    private DetalleDietaDAO detalleDietaDAO = new DetalleDietaDAOImpl();
 
     @FXML
     private void initialize() {
-        cbHorario.setItems(FXCollections.observableArrayList(DetalleDieta.Horario.values()));
+        colId.setCellValueFactory(c ->
+                new SimpleObjectProperty<>(c.getValue().getId()));
 
-        colHorario.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getHorario().name()));
-        colDescripcion.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getDescripcion()));
+        colHorario.setCellValueFactory(c ->
+                new SimpleStringProperty(
+                        c.getValue().getHorario()
+                ));
 
-        tablaDetalles.setItems(listaDetalles);
+        colDescripcion.setCellValueFactory(c ->
+                new SimpleStringProperty(
+                        c.getValue().getDescripcion()
+                ));
+
+        tablaDetalles.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((observable, anterior, seleccionado) -> {
+                    if (seleccionado != null) {
+                        txtDescripcion.setText(seleccionado.getDescripcion());
+                        cbHorario.setValue(seleccionado.getHorario());
+                    }
+                });
     }
 
     public void setDieta(Dieta dieta) {
         this.dietaSeleccionada = dieta;
-        if (dieta.getDetalles() != null) {
-            listaDetalles.setAll(dieta.getDetalles());
-        } else {
-            dieta.setDetalles(FXCollections.observableArrayList());
-        }
+        cargarDetalles();
+        cargarHorarios();
     }
 
     @FXML
-    private void agregarDetalle() {
+    private void nuevoDetalle() {
+        limpiarCampos();
+    }
+
+    @FXML
+    private void guardarDetalle() {
         if (cbHorario.getValue() == null || txtDescripcion.getText().isEmpty()) {
             mostrarAlerta("Seleccione un horario y agregue una descripción.");
             return;
         }
 
-        DetalleDieta nuevo = new DetalleDieta(
-                (long) (listaDetalles.size() + 1),
-                dietaSeleccionada,
-                cbHorario.getValue(),
-                txtDescripcion.getText()
-        );
+        DetalleDieta nuevo = new DetalleDieta();
+        nuevo.setHorario(cbHorario.getValue());
+        nuevo.setDescripcion(txtDescripcion.getText());
+        nuevo.setDieta(dietaSeleccionada);
 
-        listaDetalles.add(nuevo);
-        dietaSeleccionada.getDetalles().add(nuevo);
+        detalleDietaDAO.guardar(nuevo);
+        cargarDetalles();
         limpiarCampos();
+    }
+
+    @FXML
+    private void modificarDetalle() {
+        DetalleDieta seleccionado =
+                tablaDetalles.getSelectionModel().getSelectedItem();
+
+        if (seleccionado != null) {
+            seleccionado.setDescripcion(txtDescripcion.getText());
+            seleccionado.setHorario(cbHorario.getValue());
+            seleccionado.setDieta(dietaSeleccionada);
+
+            detalleDietaDAO.modificar(seleccionado);
+            cargarDetalles();
+            limpiarCampos();
+        }
     }
 
     @FXML
     private void eliminarDetalle() {
         DetalleDieta seleccionado = tablaDetalles.getSelectionModel().getSelectedItem();
         if (seleccionado != null) {
-            listaDetalles.remove(seleccionado);
-            dietaSeleccionada.getDetalles().remove(seleccionado);
+            detalleDietaDAO.eliminar(seleccionado.getId());
+            cargarDetalles();
+            limpiarCampos();
         } else {
             mostrarAlerta("Seleccione un detalle para eliminar.");
         }
     }
 
+    private void cargarDetalles() {
+        listaDetalles.clear();
+        List<DetalleDieta> detalles = detalleDietaDAO.listarPorDieta(dietaSeleccionada.getId());
+        listaDetalles.addAll(detalles);
+        tablaDetalles.setItems(listaDetalles);
+    }
+
+    private void cargarHorarios() {
+        horarios.addAll(
+                listaDetalles.stream()
+                        .map(DetalleDieta::getHorario)
+                        .sorted()
+                        .toList()
+        );
+        cbHorario.setItems(horarios);
+    }
+
     private void limpiarCampos() {
         cbHorario.setValue(null);
         txtDescripcion.clear();
+        tablaDetalles.getSelectionModel().clearSelection();
     }
 
     private void mostrarAlerta(String mensaje) {

@@ -186,6 +186,7 @@ public class ControladorDieta {
             stage.setScene(new Scene(loader.load()));
 
             ControladorDetalleDieta controladorDetalle = loader.getController();
+
             controladorDetalle.setDieta(seleccionada);
 
             stage.show();
