@@ -14,6 +14,8 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
+import java.util.Optional;
+
 public class ControladorMedicamento {
 
     @FXML
@@ -94,6 +96,7 @@ public class ControladorMedicamento {
                         txtNombreMedicamento.setText(seleccionado.getNombre());
                         txtDosis.setText(seleccionado.getDosis());
                         cbFrecuencia.setValue(seleccionado.getFrecuencia());
+                        btnGuardar.setDisable(true);
                     }
                 });
 
@@ -119,6 +122,10 @@ public class ControladorMedicamento {
             return;
         }
 
+        if (!confirmarAccion("¿Está seguro de guardar el medicamento?")) {
+            return;
+        }
+
         Medicamento nuevo = new Medicamento(
                 txtNombreMedicamento.getText(),
                 txtDosis.getText(),
@@ -138,6 +145,9 @@ public class ControladorMedicamento {
 
         Medicamento seleccionado = tablaMedicamentos.getSelectionModel().getSelectedItem();
         if (seleccionado != null) {
+            if (!confirmarAccion("¿Está seguro de modificar el medicamento?")) {
+                return;
+            }
             seleccionado.setNombre(txtNombreMedicamento.getText());
             seleccionado.setDosis(txtDosis.getText());
             seleccionado.setFrecuencia(cbFrecuencia.getValue());
@@ -157,6 +167,9 @@ public class ControladorMedicamento {
 
         Medicamento seleccionado = tablaMedicamentos.getSelectionModel().getSelectedItem();
         if (seleccionado != null) {
+            if (!confirmarAccion("¿Está seguro de eliminar el medicamento?")) {
+                return;
+            }
             medicamentoDAO.eliminar(seleccionado.getId());
             cargarMedicamentos();
             limpiarCampos();
@@ -181,6 +194,7 @@ public class ControladorMedicamento {
         txtNombreMedicamento.clear();
         txtDosis.clear();
         cbFrecuencia.setValue(null);
+        btnGuardar.setDisable(false);
         tablaMedicamentos.getSelectionModel().clearSelection();
     }
 
@@ -190,6 +204,20 @@ public class ControladorMedicamento {
         alerta.setHeaderText(null);
         alerta.setContentText(mensaje);
         alerta.showAndWait();
+    }
+
+    private boolean confirmarAccion(String mensaje) {
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+
+        alert.setTitle("Confirmación");
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+
+        Optional<ButtonType> resultado = alert.showAndWait();
+
+        return resultado.isPresent()
+                && resultado.get() == ButtonType.OK;
     }
 
     private void configurarPermisos() {

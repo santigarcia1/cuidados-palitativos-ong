@@ -17,6 +17,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Optional;
 
 /**
  * Controlador para la pantalla de gestión de planes de cuidado.
@@ -168,10 +169,8 @@ public class ControladorPlanesCuidado {
 
                         txtObservaciones.setText(seleccionado.getObservaciones());
                         cbPacientes.setValue(seleccionado.getPaciente());
-//                        cbDietas.setValue(seleccionado.getDieta());
-//                        cbMedicamentos.setValue(seleccionado.getMedicamento());
                         cbProfesionales.setValue(seleccionado.getProfesional());
-
+                        btnGuardar.setDisable(true);
                         if (seleccionado.getFechaCreacion() != null) {
                             dpFechaCreacion.setValue(
                                     seleccionado.getFechaCreacion()
@@ -216,6 +215,10 @@ public class ControladorPlanesCuidado {
             return;
         }
 
+        if (!confirmarAccion("¿Está seguro de guardar el plan de cuidado?")) {
+            return;
+        }
+
         PlanCuidado nuevoPlan = new PlanCuidado();
         nuevoPlan.setPaciente(paciente);
         nuevoPlan.setProfesional(profesional);
@@ -241,6 +244,10 @@ public class ControladorPlanesCuidado {
                 tablaPlanes.getSelectionModel().getSelectedItem();
 
         if (seleccionado != null) {
+            if (!confirmarAccion("¿Está seguro de modificar el plan de cuidado?")) {
+                return;
+            }
+
             seleccionado.setObservaciones(txtObservaciones.getText());
             seleccionado.setPaciente(cbPacientes.getValue());
             seleccionado.setProfesional(cbProfesionales.getValue());
@@ -260,6 +267,10 @@ public class ControladorPlanesCuidado {
     private void eliminarPlan() {
         PlanCuidado seleccionado = tablaPlanes.getSelectionModel().getSelectedItem();
         if (seleccionado != null) {
+            if (!confirmarAccion("¿Está seguro de eliminar el plan de cuidado?")) {
+                return;
+            }
+
             planCuidadoDAO.eliminar(seleccionado.getId());
             limpiarCampos();
             cargarInfoInicial();
@@ -359,6 +370,7 @@ public class ControladorPlanesCuidado {
         cbPacientes.setValue(null);
         cbProfesionales.setValue(null);
 
+        btnGuardar.setDisable(false);
         tablaPlanes.getSelectionModel().clearSelection();
     }
 
@@ -368,6 +380,20 @@ public class ControladorPlanesCuidado {
         alert.setHeaderText(null);
         alert.setContentText(mensaje);
         alert.showAndWait();
+    }
+
+    private boolean confirmarAccion(String mensaje) {
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+
+        alert.setTitle("Confirmación");
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+
+        Optional<ButtonType> resultado = alert.showAndWait();
+
+        return resultado.isPresent()
+                && resultado.get() == ButtonType.OK;
     }
 
     private boolean puedeGestionarPlanes() {

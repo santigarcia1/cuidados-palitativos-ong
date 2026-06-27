@@ -13,7 +13,6 @@ import java.util.List;
 public class UsuarioDAOImpl implements UsuarioDAO {
     @Override
     public Usuario buscarPorEmail(String email) {
-        Usuario usuario = new Usuario();
 
         String sql = """
                 SELECT u.*, e.id as id_estado, e.nombre as nombre_estado,
@@ -33,8 +32,14 @@ public class UsuarioDAOImpl implements UsuarioDAO {
             ps.setString(1, email);
 
             ResultSet rs = ps.executeQuery();
+            if (!rs.next()) {
+                return null;
+            }
 
             rs.next();
+
+            Usuario usuario = new Usuario();
+            usuario.setId(rs.getLong("id"));
             usuario.setEmail(rs.getString("email"));
             usuario.setContrasena(rs.getString("contraseña"));
 
@@ -54,7 +59,7 @@ public class UsuarioDAOImpl implements UsuarioDAO {
             e.printStackTrace();
         }
 
-        return usuario;
+        return null;
     }
 
     @Override

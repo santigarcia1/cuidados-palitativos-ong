@@ -12,14 +12,19 @@ public class MainApp extends Application {
     public void start(Stage primaryStage) throws Exception {
         mainStage = primaryStage;
         primaryStage.setTitle("Manos Abiertas - Sistema de Gestión de Cuidados Paliativos");
-        showLogin();
+        showLogin(primaryStage);
         primaryStage.show();
     }
 
-    public static void showLogin() throws Exception {
-        FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("/com/cuidados/paliativos/vista/login.fxml"));
+    public static void showLogin(Stage stage) throws Exception {
+        FXMLLoader loader = new FXMLLoader(
+                MainApp.class.getResource("/com/cuidados/paliativos/vista/login.fxml"));
+
         Scene scene = new Scene(loader.load());
-        mainStage.setScene(scene);
+
+        stage.setScene(scene);
+        stage.setTitle("Inicio de sesión");
+        stage.show();
     }
 
     public static void showMainMenu() throws Exception {
