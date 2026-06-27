@@ -17,6 +17,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -68,13 +69,13 @@ public class ControladorPlanesCuidado {
 
     private final PlanCuidadoDAO planCuidadoDAO = new PlanCuidadoDAOImpl();
 
+    private final PlanDietaDAO planDietaDAO = new PlanDietaImpl();
+
+    private final PlanMedicamentoDAO planMedicamentoDAO = new PlanMedicamentoDAOImpl();
+
     private final PacienteDAO pacienteDAO = new PacienteDAOImpl();
 
     private final ProfesionalDAO profesionalDAO = new ProfesionalDAOImpl();
-
-    private final MedicamentoDAO medicamentoDAO = new MedicamentoDAOImpl();
-
-    private final DietaDAO dietaDAO = new DietaDAOImpl();
 
     // --- Inicialización ---
     @FXML
@@ -270,7 +271,8 @@ public class ControladorPlanesCuidado {
             if (!confirmarAccion("¿Está seguro de eliminar el plan de cuidado?")) {
                 return;
             }
-
+            planMedicamentoDAO.eliminarPorPlan(seleccionado.getId());
+            planDietaDAO.eliminarPorPlan(seleccionado.getId());
             planCuidadoDAO.eliminar(seleccionado.getId());
             limpiarCampos();
             cargarInfoInicial();

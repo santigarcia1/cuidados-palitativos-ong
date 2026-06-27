@@ -6,6 +6,7 @@ import com.cuidados.paliativos.persistencia.ConexionBD;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class DetalleDietaDAOImpl implements DetalleDietaDAO {
@@ -125,5 +126,33 @@ public class DetalleDietaDAOImpl implements DetalleDietaDAO {
         }
 
         return detalles;
+    }
+
+    @Override
+    public List<String> listarHorarios() {
+        List<String> horarios = new ArrayList<>();
+
+        String sql = """
+                SELECT DISTINCT horario
+                FROM detalle_dieta
+                ORDER BY horario desc
+                """;
+
+        try (
+                Connection conn = ConexionBD.conectar();
+                PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                horarios.add(rs.getString("horario"));
+            }
+            return horarios;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 }

@@ -51,4 +51,24 @@ public class PlanMedicamentoDAOImpl implements PlanMedicamentoDAO {
             e.printStackTrace();
         }
     }
+
+    public void eliminarPorPlan(Long idPlan) {
+
+        String sql = """
+            DELETE FROM plan_medicamento
+            WHERE id_plan = ?
+            """;
+
+        try (
+                Connection conn = ConexionBD.conectar();
+                PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+
+            ps.setLong(1, idPlan);
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

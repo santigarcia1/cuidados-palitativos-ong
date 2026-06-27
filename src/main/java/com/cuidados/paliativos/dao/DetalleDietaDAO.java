@@ -2,6 +2,7 @@ package com.cuidados.paliativos.dao;
 
 import com.cuidados.paliativos.modelo.DetalleDieta;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public interface DetalleDietaDAO {
@@ -13,4 +14,6 @@ public interface DetalleDietaDAO {
     void eliminar(Long id);
 
     List<DetalleDieta> listarPorDieta(Long idDieta);
+
+    List<String> listarHorarios();
 }

@@ -1,9 +1,7 @@
 package com.cuidados.paliativos.controlador;
 
-import com.cuidados.paliativos.dao.DietaDAO;
-import com.cuidados.paliativos.dao.DietaDAOImpl;
-import com.cuidados.paliativos.dao.TipoDietaDAO;
-import com.cuidados.paliativos.dao.TipoDietaDAOImpl;
+import com.cuidados.paliativos.dao.*;
+import com.cuidados.paliativos.modelo.DetalleDieta;
 import com.cuidados.paliativos.modelo.Dieta;
 import com.cuidados.paliativos.modelo.TipoDieta;
 import com.cuidados.paliativos.modelo.Usuario;
@@ -17,6 +15,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class ControladorDieta {
@@ -67,6 +67,8 @@ public class ControladorDieta {
     private final DietaDAO dietaDAO = new DietaDAOImpl();
 
     private final TipoDietaDAO tipoDietaDAO = new TipoDietaDAOImpl();
+
+    private final DetalleDietaDAO detalleDietaDAO = new DetalleDietaDAOImpl();
 
     @FXML
     private void initialize() {
@@ -174,6 +176,11 @@ public class ControladorDieta {
         if (seleccionada != null) {
             if (!confirmarAccion("¿Está seguro de eliminar la dieta?")) {
                 return;
+            }
+
+            List<DetalleDieta> detalles = detalleDietaDAO.listarPorDieta(seleccionada.getId());
+            for (DetalleDieta detalle : detalles) {
+                detalleDietaDAO.eliminar(detalle.getId());
             }
             dietaDAO.eliminar(seleccionada.getId());
             cargarDietas();

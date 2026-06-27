@@ -35,6 +35,9 @@ public class ControladorDetalleDieta {
     @FXML
     private TableColumn<DetalleDieta, String> colDescripcion;
 
+    @FXML
+    private Button btnGuardar;
+
     private final ObservableList<DetalleDieta> listaDetalles = FXCollections.observableArrayList();
 
     private final ObservableList<String> horarios = FXCollections.observableArrayList();
@@ -64,6 +67,7 @@ public class ControladorDetalleDieta {
                     if (seleccionado != null) {
                         txtDescripcion.setText(seleccionado.getDescripcion());
                         cbHorario.setValue(seleccionado.getHorario());
+                        btnGuardar.setDisable(true);
                     }
                 });
     }
@@ -142,18 +146,14 @@ public class ControladorDetalleDieta {
     }
 
     private void cargarHorarios() {
-        horarios.addAll(
-                listaDetalles.stream()
-                        .map(DetalleDieta::getHorario)
-                        .sorted()
-                        .toList()
-        );
+        horarios.addAll(detalleDietaDAO.listarHorarios());
         cbHorario.setItems(horarios);
     }
 
     private void limpiarCampos() {
         cbHorario.setValue(null);
         txtDescripcion.clear();
+        btnGuardar.setDisable(false);
         tablaDetalles.getSelectionModel().clearSelection();
     }
 

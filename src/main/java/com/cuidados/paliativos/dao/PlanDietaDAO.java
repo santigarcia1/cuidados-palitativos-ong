@@ -6,4 +6,6 @@ public interface PlanDietaDAO {
     void guardar(Long idPlan, Long idDieta);
 
     void eliminar(Long idPlan, Long idDieta);
+
+    void eliminarPorPlan(Long idPlan);
 }

@@ -1,10 +1,7 @@
 package com.cuidados.paliativos.controlador;
 
 import com.cuidados.paliativos.dao.*;
-import com.cuidados.paliativos.modelo.Dieta;
-import com.cuidados.paliativos.modelo.PlanCuidado;
-import com.cuidados.paliativos.modelo.TipoDieta;
-import com.cuidados.paliativos.modelo.Usuario;
+import com.cuidados.paliativos.modelo.*;
 import com.cuidados.paliativos.seguridad.Permisos;
 import com.cuidados.paliativos.seguridad.Sesion;
 import javafx.collections.FXCollections;
@@ -15,6 +12,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 public class ControladorPlanDieta {
@@ -69,6 +67,8 @@ public class ControladorPlanDieta {
     private final TipoDietaDAO tipoDietaDAO = new TipoDietaDAOImpl();
 
     private final PlanDietaDAO planDietaDAO = new PlanDietaImpl();
+
+    private final DetalleDietaDAO detalleDietaDAO = new DetalleDietaDAOImpl();
 
     @FXML
     private void initialize() {
@@ -182,6 +182,10 @@ public class ControladorPlanDieta {
                 return;
             }
             planDietaDAO.eliminar(this.planSeleccionado.getId(), seleccionada.getId());
+            List<DetalleDieta> detalles = detalleDietaDAO.listarPorDieta(seleccionada.getId());
+            for (DetalleDieta detalle : detalles) {
+                detalleDietaDAO.eliminar(detalle.getId());
+            }
             dietaDAO.eliminar(seleccionada.getId());
             cargarDietas();
             limpiarCampos();
