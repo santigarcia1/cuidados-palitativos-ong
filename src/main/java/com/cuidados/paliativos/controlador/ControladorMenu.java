@@ -10,7 +10,13 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
+import javafx.stage.Window;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 public class ControladorMenu {
 
@@ -31,6 +37,9 @@ public class ControladorMenu {
 
     @FXML
     private Button btnMedicamentos;
+
+    @FXML
+    private Button btnCerrarSesion;
 
     @FXML
     private void initialize() {
@@ -194,9 +203,34 @@ public class ControladorMenu {
 
     @FXML
     private void cerrarSesion() throws Exception {
+        if (!confirmarAccion("¿Está seguro de cerrar sesión?")) {
+            return;
+        }
 
         Sesion.getInstancia().cerrarSesion();
 
-        MainApp.showLogin();
+        Stage actual = (Stage) btnCerrarSesion.getScene().getWindow();
+
+        for (Window window : new ArrayList<>(Window.getWindows())) {
+            if (window != actual && window instanceof Stage stage) {
+                stage.close();
+            }
+        }
+
+        MainApp.showLogin(actual);
+    }
+
+    private boolean confirmarAccion(String mensaje) {
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+
+        alert.setTitle("Confirmación");
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+
+        Optional<ButtonType> resultado = alert.showAndWait();
+
+        return resultado.isPresent()
+                && resultado.get() == ButtonType.OK;
     }
 }

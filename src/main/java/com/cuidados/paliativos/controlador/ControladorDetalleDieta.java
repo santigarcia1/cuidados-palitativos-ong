@@ -13,6 +13,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
 import java.util.List;
+import java.util.Optional;
 
 public class ControladorDetalleDieta {
 
@@ -85,6 +86,10 @@ public class ControladorDetalleDieta {
             return;
         }
 
+        if (!confirmarAccion("¿Está seguro de guardar el detalle de la dieta?")) {
+            return;
+        }
+
         DetalleDieta nuevo = new DetalleDieta();
         nuevo.setHorario(cbHorario.getValue());
         nuevo.setDescripcion(txtDescripcion.getText());
@@ -101,6 +106,9 @@ public class ControladorDetalleDieta {
                 tablaDetalles.getSelectionModel().getSelectedItem();
 
         if (seleccionado != null) {
+            if (!confirmarAccion("¿Está seguro de modificar el detalle de la dieta?")) {
+                return;
+            }
             seleccionado.setDescripcion(txtDescripcion.getText());
             seleccionado.setHorario(cbHorario.getValue());
             seleccionado.setDieta(dietaSeleccionada);
@@ -115,6 +123,9 @@ public class ControladorDetalleDieta {
     private void eliminarDetalle() {
         DetalleDieta seleccionado = tablaDetalles.getSelectionModel().getSelectedItem();
         if (seleccionado != null) {
+            if (!confirmarAccion("¿Está seguro de eliminar el detalle de la dieta?")) {
+                return;
+            }
             detalleDietaDAO.eliminar(seleccionado.getId());
             cargarDetalles();
             limpiarCampos();
@@ -152,5 +163,19 @@ public class ControladorDetalleDieta {
         alerta.setHeaderText(null);
         alerta.setContentText(mensaje);
         alerta.showAndWait();
+    }
+
+    private boolean confirmarAccion(String mensaje) {
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+
+        alert.setTitle("Confirmación");
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+
+        Optional<ButtonType> resultado = alert.showAndWait();
+
+        return resultado.isPresent()
+                && resultado.get() == ButtonType.OK;
     }
 }

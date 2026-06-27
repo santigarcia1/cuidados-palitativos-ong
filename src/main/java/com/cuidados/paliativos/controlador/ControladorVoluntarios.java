@@ -14,6 +14,8 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
+import java.util.Optional;
+
 public class ControladorVoluntarios {
 
     @FXML
@@ -173,6 +175,8 @@ public class ControladorVoluntarios {
                         txtTelefono.setText(seleccionado.getTelefono());
                         cbArea.setValue(seleccionado.getArea());
                         cbUsuario.setValue(seleccionado.getUsuario());
+                        btnGuardar.setDisable(true);
+                        btnModificar.setDisable(false);
                     }
                 });
 
@@ -207,6 +211,10 @@ public class ControladorVoluntarios {
             return;
         }
 
+        if (!confirmarAccion("¿Está seguro de guardar el voluntario?")) {
+            return;
+        }
+
         Voluntario nuevo = new Voluntario();
 
         nuevo.setId((long) (listaVoluntarios.size() + 1));
@@ -233,6 +241,10 @@ public class ControladorVoluntarios {
                 tablaVoluntarios.getSelectionModel().getSelectedItem();
 
         if (seleccionado != null) {
+
+            if (!confirmarAccion("¿Está seguro de modificar el voluntario?")) {
+                return;
+            }
 
             seleccionado.setNombre(txtNombre.getText());
             seleccionado.setApellido(txtApellido.getText());
@@ -261,6 +273,9 @@ public class ControladorVoluntarios {
                 tablaVoluntarios.getSelectionModel().getSelectedItem();
 
         if (seleccionado != null) {
+            if (!confirmarAccion("¿Está seguro de eliminar el voluntario?")) {
+                return;
+            }
             voluntarioDAO.eliminar(seleccionado.getId());
             cargarVoluntarios();
             limpiarCampos();
@@ -295,6 +310,10 @@ public class ControladorVoluntarios {
         cbArea.setValue(null);
         cbUsuario.setValue(null);
 
+        btnGuardar.setDisable(false);
+        btnEliminar.setDisable(false);
+        btnModificar.setDisable(false);
+
         tablaVoluntarios.getSelectionModel().clearSelection();
     }
 
@@ -306,6 +325,20 @@ public class ControladorVoluntarios {
         alerta.setContentText(mensaje);
 
         alerta.showAndWait();
+    }
+
+    private boolean confirmarAccion(String mensaje) {
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+
+        alert.setTitle("Confirmación");
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+
+        Optional<ButtonType> resultado = alert.showAndWait();
+
+        return resultado.isPresent()
+                && resultado.get() == ButtonType.OK;
     }
 
     private boolean tienePermisoGestion() {

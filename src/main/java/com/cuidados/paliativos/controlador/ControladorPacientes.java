@@ -18,6 +18,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 public class ControladorPacientes {
 
@@ -164,7 +165,7 @@ public class ControladorPacientes {
                         txtDireccion.setText(seleccionado.getDireccion());
                         txtTelefono.setText(seleccionado.getTelefono());
                         cbEstado.setValue(seleccionado.getEstado());
-
+                        btnGuardar.setDisable(true);
                         if (seleccionado.getFechaNacimiento() != null) {
                             java.sql.Date fecha =
                                     (java.sql.Date) seleccionado.getFechaNacimiento();
@@ -204,6 +205,10 @@ public class ControladorPacientes {
                 cbEstado.getValue() == null) {
 
             mostrarAlerta("Complete todos los campos.");
+            return;
+        }
+
+        if (!confirmarAccion("¿Está seguro de guardar el paciente?")) {
             return;
         }
 
@@ -248,6 +253,9 @@ public class ControladorPacientes {
         }
 
         if (seleccionado != null) {
+            if (!confirmarAccion("¿Está seguro de modificar el paciente?")) {
+                return;
+            }
 
             seleccionado.setNombre(txtNombre.getText());
             seleccionado.setApellido(txtApellido.getText());
@@ -286,6 +294,9 @@ public class ControladorPacientes {
                 tablaPacientes.getSelectionModel().getSelectedItem();
 
         if (seleccionado != null) {
+            if (!confirmarAccion("¿Está seguro de eliminar el paciente?")) {
+                return;
+            }
             pacienteDAO.eliminar(seleccionado.getId());
             cargarPacientes();
             limpiarCampos();
@@ -318,6 +329,8 @@ public class ControladorPacientes {
 
         cbEstado.setValue(null);
 
+        btnGuardar.setDisable(false);
+
         tablaPacientes.getSelectionModel().clearSelection();
     }
 
@@ -330,6 +343,20 @@ public class ControladorPacientes {
         alerta.setContentText(mensaje);
 
         alerta.showAndWait();
+    }
+
+    private boolean confirmarAccion(String mensaje) {
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+
+        alert.setTitle("Confirmación");
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+
+        Optional<ButtonType> resultado = alert.showAndWait();
+
+        return resultado.isPresent()
+                && resultado.get() == ButtonType.OK;
     }
 
     private void configurarPermisos() {

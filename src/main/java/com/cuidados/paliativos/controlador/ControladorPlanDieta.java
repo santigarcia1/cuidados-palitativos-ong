@@ -15,6 +15,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import java.io.IOException;
+import java.util.Optional;
 
 public class ControladorPlanDieta {
 
@@ -102,6 +103,7 @@ public class ControladorPlanDieta {
                         txtNombreDieta.setText(seleccionado.getNombre());
                         txtDescripcion.setText(seleccionado.getDescripcion());
                         cbTipoDieta.setValue(seleccionado.getTipoDieta());
+                        btnGuardar.setDisable(true);
                     }
                 });
     }
@@ -131,6 +133,10 @@ public class ControladorPlanDieta {
             return;
         }
 
+        if (!confirmarAccion("¿Está seguro de guardar la dieta?")) {
+            return;
+        }
+
         Dieta nuevaDieta = new Dieta();
         nuevaDieta.setNombre(txtNombreDieta.getText());
         nuevaDieta.setDescripcion(txtDescripcion.getText());
@@ -150,6 +156,9 @@ public class ControladorPlanDieta {
 
         Dieta seleccionada = tablaDietas.getSelectionModel().getSelectedItem();
         if (seleccionada != null) {
+            if (!confirmarAccion("¿Está seguro de modificar la dieta?")) {
+                return;
+            }
             seleccionada.setNombre(txtNombreDieta.getText());
             seleccionada.setDescripcion(txtDescripcion.getText());
             seleccionada.setTipoDieta(cbTipoDieta.getValue());
@@ -169,6 +178,9 @@ public class ControladorPlanDieta {
 
         Dieta seleccionada = tablaDietas.getSelectionModel().getSelectedItem();
         if (seleccionada != null) {
+            if (!confirmarAccion("¿Está seguro de eliminar la dieta?")) {
+                return;
+            }
             planDietaDAO.eliminar(this.planSeleccionado.getId(), seleccionada.getId());
             dietaDAO.eliminar(seleccionada.getId());
             cargarDietas();
@@ -222,6 +234,7 @@ public class ControladorPlanDieta {
         txtNombreDieta.clear();
         txtDescripcion.clear();
         cbTipoDieta.setValue(null);
+        btnGuardar.setDisable(false);
         tablaDietas.getSelectionModel().clearSelection();
     }
 
@@ -231,6 +244,20 @@ public class ControladorPlanDieta {
         alert.setHeaderText(null);
         alert.setContentText(msg);
         alert.showAndWait();
+    }
+
+    private boolean confirmarAccion(String mensaje) {
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+
+        alert.setTitle("Confirmación");
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+
+        Optional<ButtonType> resultado = alert.showAndWait();
+
+        return resultado.isPresent()
+                && resultado.get() == ButtonType.OK;
     }
 
     private void configurarPermisos() {
