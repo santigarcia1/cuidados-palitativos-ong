@@ -36,8 +36,6 @@ public class UsuarioDAOImpl implements UsuarioDAO {
                 return null;
             }
 
-            rs.next();
-
             Usuario usuario = new Usuario();
             usuario.setId(rs.getLong("id"));
             usuario.setEmail(rs.getString("email"));
