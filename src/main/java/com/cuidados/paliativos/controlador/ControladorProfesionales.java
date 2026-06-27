@@ -12,6 +12,8 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
+import java.util.Optional;
+
 public class ControladorProfesionales {
 
     @FXML
@@ -167,6 +169,7 @@ public class ControladorProfesionales {
                         txtTelefono.setText(seleccionado.getTelefono());
                         cbEspecialidad.setValue(seleccionado.getEspecialidad());
                         cbUsuario.setValue(seleccionado.getUsuario());
+                        btnGuardar.setDisable(true);
                     }
                 });
 
@@ -201,6 +204,10 @@ public class ControladorProfesionales {
             return;
         }
 
+        if (!confirmarAccion("¿Está seguro de guardar el profesional?")) {
+            return;
+        }
+
         Profesional nuevo = new Profesional();
 
         nuevo.setId((long) (listaProfesionales.size() + 1));
@@ -227,7 +234,9 @@ public class ControladorProfesionales {
                 tablaProfesionales.getSelectionModel().getSelectedItem();
 
         if (seleccionado != null) {
-
+            if (!confirmarAccion("¿Está seguro de modificar el profesional?")) {
+                return;
+            }
             seleccionado.setNombre(txtNombre.getText());
             seleccionado.setApellido(txtApellido.getText());
             seleccionado.setTelefono(txtTelefono.getText());
@@ -256,6 +265,9 @@ public class ControladorProfesionales {
                 tablaProfesionales.getSelectionModel().getSelectedItem();
 
         if (seleccionado != null) {
+            if (!confirmarAccion("¿Está seguro de eliminar el profesional?")) {
+                return;
+            }
             profesionalDAO.eliminar(seleccionado.getId());
             cargarProfesionales();
             limpiarCampos();
@@ -291,6 +303,8 @@ public class ControladorProfesionales {
         cbEspecialidad.setValue(null);
         cbUsuario.setValue(null);
 
+        btnGuardar.setDisable(false);
+
         tablaProfesionales.getSelectionModel().clearSelection();
     }
 
@@ -303,6 +317,20 @@ public class ControladorProfesionales {
         alerta.setContentText(mensaje);
 
         alerta.showAndWait();
+    }
+
+    private boolean confirmarAccion(String mensaje) {
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+
+        alert.setTitle("Confirmación");
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+
+        Optional<ButtonType> resultado = alert.showAndWait();
+
+        return resultado.isPresent()
+                && resultado.get() == ButtonType.OK;
     }
 
     private boolean tienePermisoGestion() {

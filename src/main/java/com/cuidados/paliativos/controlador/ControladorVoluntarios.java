@@ -201,10 +201,6 @@ public class ControladorVoluntarios {
             return;
         }
 
-        if (!confirmarAccion("¿Está seguro de guardar el voluntario?")) {
-            return;
-        }
-
         if (txtNombre.getText().isEmpty() ||
                 txtApellido.getText().isEmpty() ||
                 txtTelefono.getText().isEmpty() ||
@@ -212,6 +208,10 @@ public class ControladorVoluntarios {
                 cbUsuario.getValue() == null) {
 
             mostrarAlerta("Complete todos los campos.");
+            return;
+        }
+
+        if (!confirmarAccion("¿Está seguro de guardar el voluntario?")) {
             return;
         }
 
